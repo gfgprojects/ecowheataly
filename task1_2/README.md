@@ -36,7 +36,6 @@ The setup needed to perform ECOWHEATALY LCA is as follows:
 
 		The script registers the processes for tractors and the nitrogen fertilizer use.
 
-\end{itemize}
 
 ### Use
 
