@@ -29,17 +29,17 @@ The setup needed to perform ECOWHEATALY LCA is as follows:
 		`from bw_recipe_2016 import add_recipe_2016`
 		
 		`add_recipe_2016()`
-- run the `setup_recipe_2016_ecowheataly_customization.py` script found in the src folder.
+- run the `setup_recipe_2016_ecowheataly_customization.py` script found in the scripts folder.
 
 		The script creates the set of methods used in ECOWHEATALY, starting from the ReCiPe 2016 ones.
-- run the `setup_register_processes.py` script found in the src folder.
+- run the `setup_register_processes.py` script found in the scripts folder.
 
 		The script registers the processes for tractors and the nitrogen fertilizer use.
 
 
 ### Use
 
-Once the setups have been made, the `ecowheataly_lca_with_brightway.py` (also found in the src folder) makes calculations and shows the results.
+Once the setups have been made, the `ecowheataly_lca_with_brightway.py` (also found in the scripts folder) makes calculations and shows the results.
 
 The user can now go through the usual workflow: edit the `ecowheataly_lca_with_brightway.py` script, go to the inputs section, change the input values, execute the script, and analyze the results.
 
