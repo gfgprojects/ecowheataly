@@ -32,6 +32,7 @@ The setup needed to perform ECOWHEATALY LCA is as follows:
 - run the `setup_recipe_2016_ecowheataly_customization.py` script found in the scripts folder.
 
 		The script creates the set of methods used in ECOWHEATALY, starting from the ReCiPe 2016 ones.
+
 - run the `setup_register_processes.py` script found in the scripts folder.
 
 		The script registers the processes for tractors and the nitrogen fertilizer use.
