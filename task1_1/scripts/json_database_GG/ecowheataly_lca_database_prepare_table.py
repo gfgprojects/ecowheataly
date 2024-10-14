@@ -16,6 +16,8 @@ farm_keys=list(ewdata.keys())
 data_for_table=[]
 for key in farm_keys:
     tmp_farm_data=ewdata.get(key)
+    provincia=tmp_farm_data['geo']
+    altimetria=tmp_farm_data['zona altimetrica 5']
     tmp_farm_years=tmp_farm_data['years'].keys()
     for y in tmp_farm_years:
         tmp_farm_year_colture=tmp_farm_data['years'][y]['colture'].keys()
@@ -56,7 +58,7 @@ for key in farm_keys:
                     #print([key,y,'Frumento duro',lu,luph,Nxha,Pxha,Kxha,number_of_herbicides_treatments,number_of_insecticides_treatments,number_of_coajuvants_treatments])
 
 
-                data_for_table.append([key,y,lu,luph,Nxha,Pxha,Kxha,number_of_herbicides_treatments,number_of_insecticides_treatments,number_of_coajuvants_treatments])
+                data_for_table.append([key,y,lu,luph,Nxha,Pxha,Kxha,number_of_herbicides_treatments,number_of_insecticides_treatments,number_of_coajuvants_treatments,provincia,altimetria])
                 #print([key,y,'Frumento duro',lu,luph])
             else:
                 print('land use=0 or hours of tractors=0')
@@ -64,7 +66,7 @@ for key in farm_keys:
 
 
 import pandas as pd
-table_df=pd.DataFrame(data=data_for_table,columns=['Farm ID','Year','Superficie coltivata','Ore uso macchina per ettaro','kg azoto per ettaro','kg fosforo per ettaro','kg potassio per ettaro','n trattamenti diserbanti','n trattamenti insetticidi','n trattamenti coadiuvanti'])
+table_df=pd.DataFrame(data=data_for_table,columns=['Farm ID','Year','Superficie coltivata','Ore uso macchina per ettaro','kg azoto per ettaro','kg fosforo per ettaro','kg potassio per ettaro','n trattamenti diserbanti','n trattamenti insetticidi','n trattamenti coadiuvanti','provincia','altimetria'])
 
 #table_df.to_csv('dati_grano_duro.csv',index=False)
 

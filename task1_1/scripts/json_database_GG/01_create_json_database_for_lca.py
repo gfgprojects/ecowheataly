@@ -39,7 +39,7 @@ datastore={}
 for code in farm_codes:
  tmp_df=aziende_all.loc[aziende_all["Cod_Azienda"] == code].sort_values("Anno")
  tmp_df.index=range(tmp_df.shape[0])
- datastore[str(code)]={"count_in_farms_file(years)": int(tmp_df.shape[0]),"geo":tmp_df.loc[0,"Provincia"]}
+ datastore[str(code)]={"count_in_farms_file(years)": int(tmp_df.shape[0]),"geo":tmp_df.loc[0,"Provincia"],"zona altimetrica 5":tmp_df.loc[0,"Zona_Altimetrica_5"]}
  datastore[str(code)]["years"]={} 
  for runner in tmp_df.index:
   datastore[str(code)]["years"][str(tmp_df.loc[runner,"Anno"])]={"SAU(ha)":float(tmp_df.loc[runner,"SAU"]),"Produzione_Standard_Aziendale(Euro)":float(tmp_df.loc[runner,"Produzione_Standard_Aziendale"]),"KW_Macchine":float(tmp_df.loc[runner,"KW_Macchine"]),"colture":{}} 
