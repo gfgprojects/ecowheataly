@@ -13,7 +13,7 @@ from tqdm import tqdm
 from datetime import datetime
 import matplotlib.pyplot as plt
 
-import clustering
+from clustering_pipeline import clustering
 
 
 def _get_cluster_stats(clustered_df: pd.DataFrame):
@@ -64,12 +64,12 @@ def _compute_optimal_k(result_df: pd.DataFrame):
 def main(year: int = 2016):
     
     # Create the "output" folder if it doesn't exist
-    output_folder_path = 'output'
+    output_folder_path = 'clustering_pipeline/output'
     if not os.path.exists(output_folder_path):
         os.makedirs(output_folder_path)
     
     # Step 1: Load data
-    flat_df = pd.read_csv("data/flat_df.csv")  # Load data into a DataFrame
+    flat_df = pd.read_csv("clustering_pipeline/data/flat_df.csv")  # Load data into a DataFrame
     
     # Filter data for the selected year
     print(f"Filtering year for selected value: {year}")

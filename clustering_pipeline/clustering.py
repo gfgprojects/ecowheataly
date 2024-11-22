@@ -159,7 +159,7 @@ def visualize_clusters(df: pd.DataFrame, x: str, y: str, export_locally: bool = 
 
 
 def analyze_clusters(
-        df: pd.DataFrame = pd.read_excel("data/rica_duro_aziende_specializzate_all.xlsx"),
+        df: pd.DataFrame = pd.read_excel("clustering_pipeline/data/rica_duro_aziende_specializzate_all.xlsx"),
         remove_outliers: bool = True,
         y_col_to_plot: str = 'resa [qt/ha',
         k : int = None,
