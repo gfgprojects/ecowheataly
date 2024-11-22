@@ -35,6 +35,9 @@ pip install numpy pandas matplotlib tqdm
 
 ## Running the Script
 
+The script must be run from the main workind directory; namely, ecowheataly.
+Thus, firs cd into that repository and then proceed with the following steps.
+
 ### Step 1: Prepare Data
 
 Ensure you have a `flat_df.csv` file in the `data/` directory. This CSV file contains the input data required for clustering.
