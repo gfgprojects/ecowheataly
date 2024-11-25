@@ -212,7 +212,7 @@ def main(year: int = 2016):
             df=flat_df, 
             x='cluster', 
             y=y_col_to_plot, 
-            export_locally=False
+            export_locally=True
         )
 
 
