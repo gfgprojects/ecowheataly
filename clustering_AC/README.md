@@ -26,11 +26,13 @@ pip install numpy pandas matplotlib tqdm
 
 ```
 .
-├── data/
-│   └── flat_df.csv  # Input data (example CSV file)
-├── output/          # Directory where output files are saved
-├── clustering.py    # Contains clustering functions used in the script
-└── 03_new_features_and_clustering.py   # Main script for ML section (described below)
+├─── 03_new_features_and_clustering.py   # Main script for ML section (described below)
+└─── clustering_pipeline/
+     ├─── output/            # Directory where output files are saved
+     ├─── data/
+     │    └──── flat_df.csv  # Input data (example CSV file)
+     └─── clustering.py      # Contains clustering functions used in the script
+
 ```
 
 ## Running the Script
