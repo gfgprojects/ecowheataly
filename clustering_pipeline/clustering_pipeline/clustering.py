@@ -117,8 +117,9 @@ def visualize_clusters(df: pd.DataFrame, x: str, y: str, export_locally: bool = 
     """
     
     # Create output directory if it doesn't exist and export_locally is True
-    if export_locally and (not os.path.exists("output")):
-        os.makedirs("output")
+    base_export_path = "clustering_pipeline/output"
+    if export_locally and (not os.path.exists(base_export_path)):
+        os.makedirs(base_export_path)
     
     plt.figure(figsize=(8, 6))
     
@@ -152,7 +153,7 @@ def visualize_clusters(df: pd.DataFrame, x: str, y: str, export_locally: bool = 
     
     # Save the plot locally if required
     if export_locally:
-        plt.savefig(f"output/{datetime.now().strftime('%Y%m%d')}_boxplot_{y}.png", format='png')
+        plt.savefig(f"{base_export_path}/{datetime.now().strftime('%Y%m%d')}_boxplot_{y}.png", format='png')
     
     # Display the plot
     plt.show()
