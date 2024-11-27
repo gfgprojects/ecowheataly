@@ -115,7 +115,7 @@ def visualize_clusters(df: pd.DataFrame, x: str, y: str, export_locally: bool = 
         y (str): Name of the column to be used as y-axis in the boxplot.
         export_locally (bool): Whether to save the plot locally.
     """
-    
+ 
     # Create output directory if it doesn't exist and export_locally is True
     base_export_path = "clustering_pipeline/output"
     if export_locally and (not os.path.exists(base_export_path)):
@@ -123,8 +123,18 @@ def visualize_clusters(df: pd.DataFrame, x: str, y: str, export_locally: bool = 
     
     plt.figure(figsize=(8, 6))
     
+    # Calculate interquartile range (IQR) for y-axis values
+    Q1 = df[y].quantile(0.25)
+    Q3 = df[y].quantile(0.75)
+    IQR = Q3 - Q1
+    
+    # Exclude outliers beyond 1.5 * IQR
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    df_filtered = df[(df[y] >= lower_bound) & (df[y] <= upper_bound)]
+    
     # Create the boxplot
-    ax = sns.boxplot(x=x, y=y, data=df)
+    ax = sns.boxplot(x=x, y=y, data=df_filtered)
     
     # Calculate the number of observations per category
     counts = df.groupby(x)[y].size().reset_index(name='counts')
@@ -134,14 +144,18 @@ def visualize_clusters(df: pd.DataFrame, x: str, y: str, export_locally: bool = 
     
     # Add the observation count and percentage as text on the boxplot
     for i, row in counts.iterrows():
-        # Get the whisker max (top whisker) for the boxplot to position the label better
+        # Get the whisker max (top whisker) for the filtered data
         whisker_max = (
-            df[df[x] == row[x]][y].quantile(0.75) + 1.5 * 
-            (df[df[x] == row[x]][y].quantile(0.75) - df[df[x] == row[x]][y].quantile(0.25))
-            ) * 2
+            df_filtered[df_filtered[x] == row[x]][y].quantile(0.75) + 1.5 *
+            (df_filtered[df_filtered[x] == row[x]][y].quantile(0.75) - df_filtered[df_filtered[x] == row[x]][y].quantile(0.25))
+        )
         
-        # Add the text label closer to the top of the whisker with count and percentage
-        ax.text(i, whisker_max + (df[y].max() - df[y].min()) * 0.02, 
+        # Adjust the label position dynamically to avoid overlap with datapoints
+        max_point = df_filtered[df_filtered[x] == row[x]][y].max()
+        label_position = max(whisker_max, max_point) + (df_filtered[y].max() - df_filtered[y].min()) * 0.05
+        
+        # Add the text label with count and percentage
+        ax.text(i, label_position,
                 f'n = {int(row["counts"])}\n({row["percentage"]:.1f}%)',
                 horizontalalignment='center', size='small', color='black', weight='semibold')
     

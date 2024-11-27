@@ -113,7 +113,8 @@ def main(year: int = 2016):
     # Step 4: Filter Relevant Columns
     input_l = [
         # List of clustering input features (some columns are commented out but kept for reference)
-        'herbicide_ratio_over_yield', 'elements_ratio_over_yield',
+        'herbicide_ratio_over_yield', 
+        'elements_ratio_over_yield',
         'hours_of_machines_ha_over_yield'
     ]
 
@@ -197,14 +198,19 @@ def main(year: int = 2016):
     flat_df["cluster"] = clustered_df["cluster"]
 
     # Step 9: Cluster Visualization
-    cols_to_plot = [
-       'farm_acreage', 'produced_quantity',
-       'crop_acreage', 'hours_of_machines_ha', 
-       'nitrogen_ha', 'herbicide_ratio',
-       'herbicide_ratio_over_yield', 
-       'elements_ratio_over_yield',
-       'hours_of_machines_ha_over_yield'
-    ]
+    # cols_to_plot = [
+    #    'farm_acreage', 
+    #    'produced_quantity',
+    #    'crop_acreage', 
+    #    'hours_of_machines_ha', 
+    #    'nitrogen_ha', 
+    #    'herbicide_ratio',
+    #    'herbicide_ratio_over_yield', 
+    #    'elements_ratio_over_yield',
+    #    'hours_of_machines_ha_over_yield'
+    # ]
+    
+    cols_to_plot = input_l
     
     # Visualize each cluster against specified columns
     for y_col_to_plot in cols_to_plot:
