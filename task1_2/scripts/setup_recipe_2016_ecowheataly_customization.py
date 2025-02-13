@@ -108,6 +108,9 @@ ReCiPe_2016_terrestrial_acidification_Italy_epE.write(new_CFs);
 print()
 print("Regionalizing Particulate Matter Formation, Midpoint Egalitarian")
 
+#Brightway misses the CFs for PM2.5 Here we add them to the new method
+#furthermore we choose the egalitarian perspective because it assess more elements. See table 5.2 pg. 49 of 191 of Recipe documentation
+
 amm_conversion_coef=0.65/0.24
 nit_conversion_coef=0.22/0.11
 sul_conversion_coef=0.28/0.29
@@ -144,6 +147,7 @@ ReCiPe_2016_particles_formation_Italy.validate(pm_it_CFs);
 ReCiPe_2016_particles_formation_Italy.register(**{'unit':tmp_method_unit})
 ReCiPe_2016_particles_formation_Italy.write(pm_it_CFs);
 
+#We compute endpoint by dividing midpoint CFS by 10000 as reported in table 5.3 pg. 49 of 191 of Recipe documentation
 
 print("Regionalizing Particulate Matter Formation, Endpoint Egalitarian")
 #tmp_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Human health', 'Particulate Matter Formation', 'Egalitarian')
@@ -327,6 +331,9 @@ ReCiPe_2016_freshwater_eutrophication_Italy_epE = bd.Method(new_method_name);
 ReCiPe_2016_freshwater_eutrophication_Italy_epE.validate(eutr_it_CFs);
 ReCiPe_2016_freshwater_eutrophication_Italy_epE.register(**{'unit':tmp_method_unit});
 ReCiPe_2016_freshwater_eutrophication_Italy_epE.write(eutr_it_CFs);
+
+
+#copying method with no regionalization to include the word ecowheataly in their name
 
 #bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming', '1000 year timescale', 'Egalitarian')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming 1000 year timescale', 'Humans and Ecosystems','Global','ecowheataly'))
 print('Copying global warming 100years Midpoint')
