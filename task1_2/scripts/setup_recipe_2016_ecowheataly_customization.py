@@ -26,6 +26,8 @@
 #from bw_recipe_2016 import add_recipe_2016
 #add_recipe_2016()
 import bw2data as bd
+
+
 recipe=[m for m in bd.methods if 'ReCiPe 2016' in str(m) and '20180117' in str(m)]
 recipe_Im=[m for m in recipe if 'Individualist' in str(m) and 'Midpoint' in str(m)]
 recipe_Hm=[m for m in recipe if 'Hierarchist' in str(m) and 'Midpoint' in str(m)]
