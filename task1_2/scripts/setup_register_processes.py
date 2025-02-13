@@ -115,9 +115,10 @@ strings_to_match=[]
 chosen_by_fuzzy=[]
 not_matched=[]
 new_exchanges=[]
-
+cnt = 0
 for i in range(df.shape[0]):
     this_proc_names.append(str(df.loc[i]['name']))
+    print(f" processo: {str(df.loc[i]['name'])}")
     this_proc_categories.append(str(df.loc[i]['to_element']))
     str_to_match=str(df.loc[i]['name'])+"~"+str(df.loc[i]['to_element'])
     strings_to_match.append(str_to_match)
@@ -135,6 +136,8 @@ for i in range(df.shape[0]):
         #new_exchange={'input': ('biosphere3',match_in_bs3['code']),'unit':match_in_bs3['unit'],'type':match_in_bs3['type'],'amount':quantity}
         new_exchange={'input': ('biosphere3',match_in_bs3['code']),'unit':match_in_bs3['unit'],'type':'biosphere','amount':quantity}
         new_exchanges.append(new_exchange)
+        print(f' 🎯 matched Biosphere flux: {match_in_bs3}')
+        cnt = cnt+1
         #this_proc_item['code']=extracted_code
         #this_proc_item['name']=extracted_name
         #this_proc_item['categories']=extracted_categories
@@ -143,7 +146,8 @@ for i in range(df.shape[0]):
             print("     warning: "+df.loc[i]['name']+" REPLACED BY "+extracted_name)
     else:
         not_matched.append(str_to_match+" WITH "+str(extracted))
-
+        print(f'❌ No match found in Biosphere')
+print(f'processi aggangiati: {cnt}')
 print()
 print("   the following poor matches were dropped:")
 print()
