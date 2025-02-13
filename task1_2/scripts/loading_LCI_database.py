@@ -1,8 +1,9 @@
 
 """
 import third part LCI dataset (USDA and...)
-found exchanges having a corrispondece in Biosphere (i.e., flux linking)
+found exchanges having a correspondece in Biosphere (i.e., flux linking)
 create and save the linked fluxes in compliance with BrightWay standards
+
 """
 import bw2data as bd
 import bw2io as bi
