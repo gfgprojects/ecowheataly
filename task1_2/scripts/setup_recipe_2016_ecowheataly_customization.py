@@ -29,7 +29,12 @@ import bw2data as bd
 # Load biosphere database
 bs3 = bd.Database("biosphere3")
 
+#remove previousely created ecowheataly methods
+ecow=[m for m in bd.methods if 'ecowheataly' in str(m)]
+for mt in ecow:
+    bd.Method(mt).deregister()
 
+#create groups of ReCiPe methods
 recipe=[m for m in bd.methods if 'ReCiPe 2016' in str(m) and '20180117' in str(m)]
 recipe_Im=[m for m in recipe if 'Individualist' in str(m) and 'Midpoint' in str(m)]
 recipe_Hm=[m for m in recipe if 'Hierarchist' in str(m) and 'Midpoint' in str(m)]
@@ -49,7 +54,7 @@ tmp_method_name=list(recipe_NP)[1]
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 #print(*method_cfs,sep='\n')
 new_CFs=[]
 for cf in method_cfs:
@@ -58,17 +63,17 @@ for cf in method_cfs:
         #print(str(bs3.get(cf[0][1]))+" .......... CF: "+str(cf[1]))
         #print(str(bs3.get(cf[0][1]))+" .......... CF: "+str(round(cf[1]*sul_conversion_coef,2)))
         new_CFs.append([cf[0],cf[1]*sul_conversion_coef])
-        print(f' adjusting Sul in {element_name}')
+        #print(f' adjusting Sul in {element_name}')
     elif 'Nit' in element_name:
         #print(str(bs3.get(cf[0][1]))+" .......... CF: "+str(cf[1]))
         #print(str(bs3.get(cf[0][1]))+" .......... CF: "+str(round(cf[1]*nit_conversion_coef,2)))
         new_CFs.append([cf[0],cf[1]*nit_conversion_coef])
-        print(f' adjusting Nit in {element_name}')
+        #print(f' adjusting Nit in {element_name}')
     elif 'Amm' in element_name:
         #print(str(bs3.get(cf[0][1]))+" .......... CF: "+str(cf[1]))
         #print(str(bs3.get(cf[0][1]))+" .......... CF: "+str(round(cf[1]*amm_conversion_coef,2)))
         new_CFs.append([cf[0],cf[1]*amm_conversion_coef])
-        print(f' adjusting Amm in {element_name}')
+        #print(f' adjusting Amm in {element_name}')
 new_method_name=tmp_method_name+('Ecosystems','Italy','ecowheataly')
 ReCiPe_2016_terrestrial_acidification_Italy = bd.Method(new_method_name); 
 ReCiPe_2016_terrestrial_acidification_Italy.validate(new_CFs);
@@ -81,19 +86,19 @@ tmp_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Terrestrial ecosy
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 new_CFs=[]
 for cf in method_cfs:
     element_name=bs3.get(cf[0][1])['name']
     if 'Sul' in element_name:
         new_CFs.append([cf[0],cf[1]*sul_conversion_coef])
-        print(f' adjusting Sul in {element_name}')
+        #print(f' adjusting Sul in {element_name}')
     elif 'Nit' in element_name:
         new_CFs.append([cf[0],cf[1]*nit_conversion_coef])
-        print(f' adjusting Nit in {element_name}')
+        #print(f' adjusting Nit in {element_name}')
     elif 'Amm' in element_name:
         new_CFs.append([cf[0],cf[1]*amm_conversion_coef])
-        print(f' adjusting Amm in {element_name}')
+        #print(f' adjusting Amm in {element_name}')
 new_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint','Terrestrial Acidification','Ecosystems','Italy','ecowheataly')
 ReCiPe_2016_terrestrial_acidification_Italy_epE = bd.Method(new_method_name); 
 ReCiPe_2016_terrestrial_acidification_Italy_epE.validate(new_CFs);
@@ -102,6 +107,9 @@ ReCiPe_2016_terrestrial_acidification_Italy_epE.write(new_CFs);
 
 print()
 print("Regionalizing Particulate Matter Formation, Midpoint Egalitarian")
+
+#Brightway misses the CFs for PM2.5 Here we add them to the new method
+#furthermore we choose the egalitarian perspective because it assess more elements. See table 5.2 pg. 49 of 191 of Recipe documentation
 
 amm_conversion_coef=0.65/0.24
 nit_conversion_coef=0.22/0.11
@@ -113,23 +121,23 @@ tmp_method_name=list(recipe_Em)[3]
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 pm_it_CFs=[]
 for cf in method_cfs:
     element_name=bs3.get(cf[0][1])['name']
     if 'Sul' in element_name:
         pm_it_CFs.append([cf[0],round(cf[1]*sul_conversion_coef,2)])
-        print(f' adjusting Sul in {element_name}')
+        #print(f' adjusting Sul in {element_name}')
     elif 'Nit' in element_name:
         pm_it_CFs.append([cf[0],round(cf[1]*nit_conversion_coef,2)])
-        print(f' adjusting Nit in {element_name}')
+        #print(f' adjusting Nit in {element_name}')
     elif 'Amm' in element_name:
         pm_it_CFs.append([cf[0],round(cf[1]*amm_conversion_coef,2)])
-        print(f' adjusting Amml in {element_name}')
+        #print(f' adjusting Amml in {element_name}')
 
 pm25_items=bs3.search('Particulate Matter, < 2.5 um')
 pm_lt_25_items=[ite for ite in pm25_items if '10um' not in str(ite)]
-print(f' adjusting pm in pm_lt_25_items')
+#print(f' adjusting pm in pm_lt_25_items')
 for pm in pm_lt_25_items:
     pm_it_CFs.append([(pm_lt_25_items[0]['database'],pm_lt_25_items[0]['code']),pm25_conversion_coef])
 
@@ -139,6 +147,7 @@ ReCiPe_2016_particles_formation_Italy.validate(pm_it_CFs);
 ReCiPe_2016_particles_formation_Italy.register(**{'unit':tmp_method_unit})
 ReCiPe_2016_particles_formation_Italy.write(pm_it_CFs);
 
+#We compute endpoint by dividing midpoint CFS by 10000 as reported in table 5.3 pg. 49 of 191 of Recipe documentation
 
 print("Regionalizing Particulate Matter Formation, Endpoint Egalitarian")
 #tmp_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Human health', 'Particulate Matter Formation', 'Egalitarian')
@@ -147,9 +156,9 @@ tmp_method_name=new_method_name
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 pm_it_CFs=[]
-print('scaling cf to 1/10000')
+#print('scaling cf to 1/10000')
 for cf in method_cfs:
     pm_it_CFs.append([cf[0],cf[1]/10000])
     #pm_it_CFs.append([cf[0],cf[1]/(6.29*10000)])
@@ -172,16 +181,16 @@ tmp_method_name=list(recipe_NP)[3]
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 ofdh_it_CFs=[]
 for cf in method_cfs:
     element_name=bs3.get(cf[0][1])['name']
     if 'Nit' in element_name:
         ofdh_it_CFs.append([cf[0],cf[1]*nit_conversion_coef])
-        print(f' adjusting Nit in {element_name}')
+        #print(f' adjusting Nit in {element_name}')
     else:
         ofdh_it_CFs.append([cf[0],cf[1]*nmvoc_conversion_coef])
-        print(f' adjusting nmvoc in {element_name}')
+        #print(f' adjusting nmvoc in {element_name}')
 
 new_method_name=tmp_method_name[0:len(tmp_method_name)-1]+('Humans','Italy','ecowheataly')
 ReCiPe_2016_ozone_formation_damage_to_humans_Italy = bd.Method(new_method_name); 
@@ -195,16 +204,16 @@ tmp_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Human health', 'O
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 ofdh_it_CFs=[]
 for cf in method_cfs:
     element_name=bs3.get(cf[0][1])['name']
     if 'Nit' in element_name:
         ofdh_it_CFs.append([cf[0],cf[1]*nit_conversion_coef])
-        print(f' adjusting Nit in {element_name}')
+        #print(f' adjusting Nit in {element_name}')
     else:
         ofdh_it_CFs.append([cf[0],cf[1]*nmvoc_conversion_coef])
-        print(f' adjusting nmvoc in {element_name}')
+        #print(f' adjusting nmvoc in {element_name}')
 
 new_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint','Ozone Formation','Humans','Italy','ecowheataly')
 ReCiPe_2016_ozone_formation_damage_to_humans_Italy_epE = bd.Method(new_method_name); 
@@ -223,16 +232,16 @@ tmp_method_name=list(recipe_NP)[4]
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 ofde_it_CFs=[]
 for cf in method_cfs:
     element_name=bs3.get(cf[0][1])['name']
     if 'Nit' in element_name:
         ofde_it_CFs.append([cf[0],cf[1]*nit_conversion_coef])
-        print(f' adjusting Nit in {element_name}')
+        #print(f' adjusting Nit in {element_name}')
     else:
         ofde_it_CFs.append([cf[0],cf[1]*nmvoc_conversion_coef])
-        print(f' adjusting nmvoc in {element_name}')
+        #print(f' adjusting nmvoc in {element_name}')
 
 new_method_name=tmp_method_name[0:len(tmp_method_name)-1]+('Ecosystems','Italy','ecowheataly')
 ReCiPe_2016_ozone_formation_damage_to_ecosystem_Italy = bd.Method(new_method_name); 
@@ -247,16 +256,16 @@ tmp_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Terrestrial ecosy
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 ofde_it_CFs=[]
 for cf in method_cfs:
     element_name=bs3.get(cf[0][1])['name']
     if 'Nit' in element_name:
         ofde_it_CFs.append([cf[0],cf[1]*nit_conversion_coef])
-        print(f' adjusting Nit in {element_name}')
+        #print(f' adjusting Nit in {element_name}')
     else:
         ofde_it_CFs.append([cf[0],cf[1]*nmvoc_conversion_coef])
-        print(f' adjusting nmvoc in {element_name}')
+        #print(f' adjusting nmvoc in {element_name}')
 
 new_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint','Ozone Formation','Ecosystems','Italy','ecowheataly')
 ReCiPe_2016_ozone_formation_damage_to_ecosystem_Italy_epE = bd.Method(new_method_name); 
@@ -280,17 +289,17 @@ tmp_method_name=list(recipe_NP)[6]
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 
 eutr_it_CFs=[]
 for cf in method_cfs:
     element_name=bs3.get(cf[0][1])['name']
     if 'Phospho' in element_name:
         eutr_it_CFs.append([cf[0],cf[1]*phosphorus_conversion_coef])
-        print(f' adjusting Phospho in {element_name}')
+        #print(f' adjusting Phospho in {element_name}')
     else:
         eutr_it_CFs.append([cf[0],cf[1]*phosphate_conversion_coef])
-        print(f' adjusting phosphate in {element_name}')
+        #print(f' adjusting phosphate in {element_name}')
 
 new_method_name=tmp_method_name+('Ecosystems','Italy','ecowheataly')
 ReCiPe_2016_freshwater_eutrophication_Italy = bd.Method(new_method_name); 
@@ -305,23 +314,26 @@ tmp_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Freshwater ecosys
 tmp_method=bd.Method(tmp_method_name)
 tmp_method_unit=tmp_method.metadata['unit']
 method_cfs=tmp_method.load()
-print(f'** {tmp_method_name} ** ')
+#print(f'** {tmp_method_name} ** ')
 
 eutr_it_CFs=[]
 for cf in method_cfs:
     element_name=bs3.get(cf[0][1])['name']
     if 'Phospho' in element_name:
         eutr_it_CFs.append([cf[0],cf[1]*phosphorus_conversion_coef])
-        print(f' adjusting Phospo in {element_name}')
+        #print(f' adjusting Phospo in {element_name}')
     else:
         eutr_it_CFs.append([cf[0],cf[1]*phosphate_conversion_coef])
-        print(f' adjusting phosphate in {element_name}')
+        #print(f' adjusting phosphate in {element_name}')
 
 new_method_name=('ReCiPe 2016', '1.1 (20180117)', 'Endpoint','Freshwater Eutrophication','Ecosystems','Italy','ecowheataly')
 ReCiPe_2016_freshwater_eutrophication_Italy_epE = bd.Method(new_method_name); 
 ReCiPe_2016_freshwater_eutrophication_Italy_epE.validate(eutr_it_CFs);
 ReCiPe_2016_freshwater_eutrophication_Italy_epE.register(**{'unit':tmp_method_unit});
 ReCiPe_2016_freshwater_eutrophication_Italy_epE.write(eutr_it_CFs);
+
+
+#copying method with no regionalization to include the word ecowheataly in their name
 
 #bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming', '1000 year timescale', 'Egalitarian')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming 1000 year timescale', 'Humans and Ecosystems','Global','ecowheataly'))
 print('Copying global warming 100years Midpoint')
