@@ -29,7 +29,12 @@ import bw2data as bd
 # Load biosphere database
 bs3 = bd.Database("biosphere3")
 
+#remove previousely created ecowheataly methods
+ecow=[m for m in bd.methods if 'ecowheataly' in str(m)]
+for mt in ecow:
+    bd.Method(mt).deregister()
 
+#create groups of ReCiPe methods
 recipe=[m for m in bd.methods if 'ReCiPe 2016' in str(m) and '20180117' in str(m)]
 recipe_Im=[m for m in recipe if 'Individualist' in str(m) and 'Midpoint' in str(m)]
 recipe_Hm=[m for m in recipe if 'Hierarchist' in str(m) and 'Midpoint' in str(m)]
