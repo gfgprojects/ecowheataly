@@ -65,6 +65,7 @@ conversion_factors = {
 	"Fine Dust Formation end": {"Sul": 0.28 / 0.29, "Nit": 0.22 / 0.11, "Amm": 0.65 / 0.24,"um":2.02/1}
 }
 
+
 # ----------------------------------------------------------------------------
 # iterate throught methods to adjust the CFs and save the chnages
 for met,c in zip(selected_methods,conversion_factors):
@@ -87,7 +88,7 @@ for met,c in zip(selected_methods,conversion_factors):
 
 	print(f'len di newCF: {len(new_CFs)}')
 	# Register new regionalized method with a modified name
-	new_method_name=met+('Ecosystems','Italy','ecowheataly')
+	new_method_name=met+('Italy','ecowheataly')
 	new_met = bd.Method(new_method_name)
 	new_met.validate(new_CFs)
 	new_met.register(**{'unit':tmp_method_unit})
@@ -125,4 +126,7 @@ print('Copying Toxicity Freshwater Endpoint')
 bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Freshwater ecosystems', 'Ecotoxicity', 'Freshwater', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Toxicity', 'Ecosystems - Freshwater','Global','ecowheataly'))
 
 
+
+
+##
 
