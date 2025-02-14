@@ -74,7 +74,7 @@ for exchange in db_lci.data[0].get("exchanges", []):
             print(f"❌ No category match found for {exchange['name']}")
 
 # Creating the new database process
-new_db_name = 'usda_item'
+new_db_name = 'USDA'
 new_process = {
     (new_db_name, DB["name"]): {
         "name": DB["name"],
@@ -82,11 +82,15 @@ new_process = {
         "exchanges": new_exchanges
     }
 }
+# Step 5: Register and write the database
+if new_db_name in bd.databases:
+    del bd.databases[db_name]
 
 # Register and write the new database
 new_db = bd.Database(new_db_name)
 new_db.register()
 new_db.write(new_process)
+bd.databases.flush()
 
 print(f"Data from >> {activity.get('name', 'Unknown')} << imported successfully")
 
