@@ -70,6 +70,12 @@ lca.lci()# # Builds matrices, solves the system, generates an LCI matrix
 lca.lcia()## Characterization, i.e. the multiplication of the elements of the LCI matrix
 # with characterization factors from the chosen method
 
+#  REMINDER__________________
+# Technology Matrix (A)	>>> lca.technosphere_matrix
+# Intervention Matrix (B)>>>> 	lca.biosphere_matrix
+# Unità funzionale (f)	>>> lca.demand
+# LCI (flussi aggregati)	>>> lca.inventory
+
 # Reference: Brightway2 Documentation - LCA Object Structure
 # if hasattr(lca, 'inventory'):
 #     print("LCI Inventory Matrix Shape:", lca.inventory.shape)
