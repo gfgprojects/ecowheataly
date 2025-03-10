@@ -1,6 +1,6 @@
 #type
 #exec(open("01_create_json_database_for_lca.py").read())
-#to run this script from the python prompt
+#to run this script from the python prompt -
 import os
 os.chdir('/Users/aria/Library/CloudStorage/OneDrive-CNR/ECOWHEATALY/dati_RICA_2008_2022')
 import pandas as pd
