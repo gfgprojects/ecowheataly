@@ -2,7 +2,7 @@
 #exec(open("01_create_json_database_for_lca.py").read())
 #to run this script from the python prompt
 import os
-os.chdir('/Users/aria/Library/CloudStorage/OneDrive-ConsiglioNazionaledelleRicerche/ECOWHEATALY/dati_RICA_2008_2022')
+os.chdir('/Users/aria/Library/CloudStorage/OneDrive-CNR/ECOWHEATALY/dati_RICA_2008_2022')
 import pandas as pd
 import numpy as np
 
@@ -179,6 +179,63 @@ for key, data in datastore.items():
 
 # --------------------------------------------------------------------------------------
 #Insert data from fitofarmaci.csv in datastore
+# brief statistcs: percentage of data taht will be matched in Biosphere3
+
+# Seleziona solo le colonne di interesse
+df = fitofarmaci_all[['Anno', 'Produzione_Industriale', 'Cod_Specie_Vegetale']]
+# before 2011 there are no data
+df = df[df['Anno'] >= 2011]
+
+# List of categories and their associated keywords
+categories = {
+    "Anticrittogamico": ["Anticrittogamico"],
+    "Acaricida": ["Acaricida"],
+    "Diserbante": ["Diserbante"],
+    "Insetticida": ["Insetticida"],
+    "Fitoregolatore" : ["Fitoregolatore"],
+    "Molluschicida": ["Molluschicida, nematocida, rodenticida"]  # Unificate in "Molluschicida"
+}
+
+# Function to categorize based on "Produzione_Industriale"
+def assign_category(product_name):
+    product_name = str(product_name).strip().lower()  # Normalize text
+    for category, keywords in categories.items():
+        if product_name in [kw.lower() for kw in keywords]:  # Exact match after lowercase conversion
+            return category
+    return "Other"  # If it does not match any category
+
+
+# Apply category mapping
+df['Categoria'] = df['Produzione_Industriale'].apply(assign_category)
+
+# Loop through species codes [3, 4] and years [2011-2021]
+for specie in [3, 4]:
+    print(f"\n🔍 **Analysis for Cod_Specie_Vegetale = {specie}**\n")
+
+    # Filter for the species
+    df_specie = df[df['Cod_Specie_Vegetale'] == specie].copy()
+
+    # Loop through years 2011-2021
+    for year in np.arange(2011, 2022):
+        print(f"\n📅 **Year: {year}**")
+
+        # Filter for the current year
+        df_year = df_specie[df_specie['Anno'] == year]
+
+        # Count total occurrences for this year
+        total_year = len(df_year)
+
+        if total_year == 0:
+            print("  - No data available for this year.")
+            continue  # Skip if there is no data
+
+        # Compute category percentages
+        category_counts = df_year['Categoria'].value_counts(normalize=True) * 100
+
+        # Print results per category
+        for category in categories.keys():
+            if category in category_counts:
+                print(f"  📌 {category}: {category_counts[category]:.2f}%")
 
 if verbose_flag: print("... writing pesticides data ...")
 
