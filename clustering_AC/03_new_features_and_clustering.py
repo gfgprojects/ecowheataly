@@ -134,7 +134,7 @@ def main(year: int = 2016):
 
     # Step 6: Clustering Analysis
     result_l = []  # List to store clustering results
-    for k in tqdm(range(5, 150, 5)):  # Iterate over a range of cluster sizes
+    for k in tqdm(range(5, 150, 1)):  # Iterate over a range of cluster sizes
     
         # Analyze clusters for the current number of clusters (k)
         _, _, silhouette_score, inertia = clustering.analyze_clusters(
@@ -174,11 +174,12 @@ def main(year: int = 2016):
 
     # Step 8: Final Clustering with Optimal k
     clustered_df, unique_labels, silhouette_score, inertia = clustering.analyze_clusters(
-        df=flat_df.filter(input_l),
+        df=flat_df.filter(input_l + ["farm code"]),
         remove_outliers=True,
         y_col_to_plot="herbicide_ratio_over_yield",
         k=optimal_k,
-        plot_clusters=False
+        plot_clusters=False,
+        index_col="farm code"
     )
 
     # Generate statistics for each cluster
