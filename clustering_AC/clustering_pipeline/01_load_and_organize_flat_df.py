@@ -17,7 +17,7 @@ import json
 import numpy as np
 import pandas as pd
 
-with open("Stats/ecowheataly_database.json") as ewdj:
+with open("1_DB_population/ecowheataly_database.json") as ewdj:
     data = json.load(ewdj)
 
 # anno, colture, Frumento duro, fertilizzanti, fitofarmaci
@@ -261,11 +261,11 @@ temp_df = pd.merge(df1, df2, on=['year', 'farm code'], how='left')
 flat_df = pd.merge(temp_df,df3,on=['year', 'farm code'], how='left' )
 # where there are no data on Phytosanitary means that the farm didn't use it in that year
 # hence we insert 0 and 0 must be kept as good value!
-flat_df.fillna(np.nan, inplace=True)
+# flat_df.fillna(np.nan, inplace=True)
 
 
 ## ===================== FILTERING ===========================
-from clustering_AC.clustering_pipeline.utils import clean_and_plot
+from clustering_AC.clustering_pipeline.flat_utils import clean_and_plot
 
 np.shape(flat_df)
 np.shape(flat_df.dropna())
@@ -292,7 +292,7 @@ for c in selected_cols:
 # df = clean_and_plot(flat_df,cols, plot=True, title_prefix="DB")
 
 
-df = clean_and_plot(flat_df.dropna(),selected_cols, plot=True, title_prefix="DB")
+df = clean_and_plot(flat_df,selected_cols, plot=True, title_prefix="DB")
 for year in years:
     temp = df[df['year']==year]
     print(f'in year {year} there are: ')

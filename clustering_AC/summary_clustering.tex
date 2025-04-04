@@ -14,112 +14,103 @@
 \maketitle
 
 \section{Objective}
-This script is designed to extract, merge, and preprocess agricultural and economic data from the EcoWheataly JSON database for durum wheat farms in Italy. The goal is to generate a clean and structured panel dataset suitable for machine learning tasks, particularly clustering and predictive modeling.
 
-\section{Input}
-\begin{itemize}
-    \item \texttt{ecowheataly\_database.json} – a nested JSON file containing farm-level data by year and crop.
-    \item Analysis range: 2008 to 2022.
-\end{itemize}
+This report describes the construction of a clean, structured dataset from raw JSON data and the implementation of a clustering analysis pipeline on durum wheat farms in Italy. The final goal is to uncover meaningful farm-level typologies based on input use, costs, and productivity indicators, supporting simulation and policy evaluation in the EcoWheataly framework.
 
-\section{Structure of the Database}
-Each farm entry contains:
-\begin{itemize}
-    \item General info (e.g., \texttt{farm\_acreage})
-    \item Crop-specific data under species key (\texttt{durum\_wheat}), such as:
-    \begin{itemize}
-        \item Production, value, area, cost variables
-        \item Fertilizers (categorized by type)
-        \item Phytosanitary products (categorized by toxicity and type)
-    \end{itemize}
-\end{itemize}
+\section{Database and Extraction Process}
 
-\section{Extraction Workflow}
-\subsection{Part 1: General Variables and Fertilizers}
-Extracts key indicators for each farm-year:
-\begin{itemize}
-    \item Wheat production: \texttt{produced\_quantity}, \texttt{PLV}, \texttt{crop\_acreage}, etc.
-    \item Economic data: \texttt{fert\_costs}, \texttt{phyto\_costs}, \texttt{human\_costs}, etc.
-    \item Fertilizer details: area treated, amount per hectare, unit cost, nitrogen/phosphorus/potassium content, divided by type.
-\end{itemize}
+The input is a nested JSON file containing yearly farm-level information from 2008 to 2022. Each farm entry includes general data (like total farm acreage) and crop-specific details under the key \texttt{durum\_wheat}, such as production quantities, crop areas, labor and machinery costs, as well as fertilization and phytosanitary product usage.
 
-\subsection{Part 2: Fertilizers by Type}
-For each fertilizer type (\texttt{Mineral}, \texttt{OrganoMineral}, etc.), the following variables are extracted:
-\begin{itemize}
-    \item \texttt{fert\_area}, \texttt{whole\_qt\_ha}, \texttt{unit\_cost}, \texttt{distribuited\_value}
-    \item Nutrients per hectare: \texttt{nitrogen\_ha}, \texttt{phosphorus\_ha}, \texttt{potassium\_ha}
-\end{itemize}
+The extraction process involves several steps. First, general agricultural and economic variables are collected: produced quantity, PLV, crop acreage, hours of machinery use, and different cost components. Then, fertilizer-related information is extracted and structured both at the aggregate level and broken down by type (Mineral, OrganoMineral, Other, Micro-Mineral). Each type contains specific details such as distribution area, nutrient content, and costs.
 
-\subsection{Part 3: Phytosanitary Products}
-For each phytosanitary type (\texttt{Herbicide}, \texttt{Insecticide}, \texttt{Fungicide}), the script:
-\begin{itemize}
-    \item Extracts distribution quantity by toxicity class (0–4)
-    \item Aggregates quantity per hectare for each class
-    \item Stores data in a 3D array (\texttt{Phyto}) and flattens to a 2D DataFrame
-\end{itemize}
+Phytosanitary products are extracted by category (Herbicide, Insecticide, Fungicide) and classified by toxicity levels (0–4). These quantities are aggregated per hectare and stored in structured arrays, later converted into a unified 2D dataset.
 
-\section{Data Merging and Cleaning}
-\begin{itemize}
-    \item All extracted data frames (\texttt{df1}, \texttt{df2}, \texttt{df3}) are merged on \texttt{year} and \texttt{farm code}
-    \item Missing phytosanitary data are filled with zeros (assumed not used)
-    \item NaNs in other sections are handled and flagged for filtering
-    \item Diagnostic statistics per year and farm are printed
-\end{itemize}
+\section{Merging, Cleaning and Output Dataset}
 
-\section{Visualization}
-\begin{itemize}
-    \item Boxplots and trend plots of phytosanitary product usage by toxicity class
-    \item Indicators such as zero-ratio for selected variables (e.g., \texttt{fert\_costs})
-\end{itemize}
+All collected data are merged by farm and year into a single DataFrame. Missing values in phytosanitary products are interpreted as non-use and replaced with zeros. Other NaNs are flagged and addressed through filtering. Outliers such as infinite values (e.g., from division by zero) are also removed to ensure numerical consistency. Basic statistics per year are printed to assess coverage and integrity.
 
-\section{Output}
-\begin{itemize}
-    \item Cleaned and flattened DataFrame saved as \texttt{flat\_df2.csv}
-    \item Ready for clustering and machine learning pipelines
-\end{itemize}
+The result is a flattened, cleaned panel dataset saved as \texttt{flat\_df2.csv}, which serves as the input for machine learning and clustering tasks.
 
-    \section{Preliminary Analysis of Results}
+\section{Preliminary Exploration}
 
-After constructing the full panel dataset, an initial exploration was conducted to assess data completeness and potential signals for clustering.
+Before clustering, a preliminary exploration helps assess completeness and highlight potential dimensions of heterogeneity. For each year, we compute the number of available observations, the count of complete records, and the number of farms cultivating durum wheat. A zero-ratio analysis reveals the proportion of farms with zero values for key inputs like \texttt{fert\_costs}, \texttt{phyto\_costs}, or nutrient application, shedding light on possible differences in farming strategies or data sparsity.
 
-\subsection{Missing Data Overview}
-For each year, the script reports:
-\begin{itemize}
-    \item Total number of farm-level observations
-    \item Number of complete records with all key variables available
-    \item Number of distinct farms producing \texttt{durum\_wheat}
-\end{itemize}
+Phytosanitary product use is further examined by plotting toxicity-class quantities over time. Both boxplots (showing the spread of log-transformed values) and line plots (showing yearly averages) help visualize changes in intensity and distribution across years and toxicity classes.
 
-This provides insight into the evolution of data coverage and production activity over time.
+\section{Clustering Analysis}
 
-\subsection{Zero-Ratio Analysis}
-For selected economic and input-related variables such as:
-\begin{itemize}
-    \item \texttt{PLV}, \texttt{fert\_costs}, \texttt{phyto\_costs}
-    \item \texttt{Mineral\_distribuited\_value}, \texttt{Mineral\_nitrogen\_ha}
-\end{itemize}
-the share of zero values is computed. High zero-ratio values may indicate non-use, data quality issues, or real heterogeneity in input intensity.
+Once the panel dataset is ready, we proceed with clustering to identify groups of farms that behave similarly. This unsupervised approach helps detect patterns in the way farmers use inputs and achieve yields, revealing potential typologies of input efficiency, intensification, or resource allocation.
 
-\subsection{Phytosanitary Product Trends}
-Toxicity-class-specific quantities are plotted over time for each phytosanitary category:
-\begin{itemize}
-    \item Boxplots show distribution of \texttt{log(1 + quantity\_ha)} per class and year.
-    \item Line plots show mean quantities per class across years.
-\end{itemize}
+To achieve this, three composite indicators were selected: the total phytosanitary product usage normalized by yield (\texttt{phyto\_ratio\_over\_yield}), the combined nutrient use per yield (\texttt{ferti\_ratio\_over\_yield}), and the hours of machinery use per hectare over yield (\texttt{hours\_of\_machines\_ha\_over\_yield}). These indicators summarize multidimensional information and enable clustering in a compact feature space.
 
-This visualization allows assessment of both intensity and spread of use by type and toxicity level.
+Outlier detection is performed using the Isolation Forest algorithm, which identifies and removes anomalous observations that could bias cluster centroids. The selected features are then standardized using the \texttt{StandardScaler} to ensure comparability in Euclidean space.
 
-\subsection{Data Cleaning and Final Dataset}
-After filtering out incomplete observations, the cleaned dataset is stored in \texttt{flat\_df2.csv}. This dataset contains:
-\begin{itemize}
-    \item Time-consistent and farm-aligned information
-    \item Explicit zeros for missing phytosanitary use (assumed non-use)
-    \item Numerical consistency checks (e.g., removal of infinite values)
-\end{itemize}
+To find the optimal number of clusters, we use a combination of inertia (total within-cluster variance) and silhouette score (average cohesion and separation). By computing these metrics across a range of cluster numbers (from 5 to 150), we identify the elbow point and the silhouette peak. In our case, the analysis points to 5 as the optimal number of clusters.
 
-This forms the basis for downstream tasks such as clustering of farm strategies or predictive modeling.
+After assigning each valid observation to a cluster using KMeans, descriptive statistics are computed for each group. These include the mean and standard deviation of each variable, as well as the size and proportion of each cluster.
 
+\section{Cluster Visualization}
 
+The following figures display the distribution of key variables across the resulting clusters, using boxplots to highlight intra-cluster variation and potential outliers. These charts provide insights into how different clusters compare in terms of input use and yield performance.
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{clustering_pipeline/output/20250404_boxplot_PLV_2_Qt.png}
+    \caption{PLV per quintal across clusters}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{clustering_pipeline/output/20250404_boxplot_farm_yield.png}
+    \caption{Farm yield per hectare across clusters}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{clustering_pipeline/output/20250404_boxplot_crop_acreage.png}
+    \caption{Crop acreage across clusters}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{clustering_pipeline/output/20250404_boxplot_hours_of_machines_ha.png}
+    \caption{Machinery use per hectare across clusters}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{clustering_pipeline/output/20250404_boxplot_hours_of_machines_ha_over_yield.png}
+    \caption{Machinery use over yield across clusters}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{clustering_pipeline/output/20250404_boxplot_fert_costs_2_Qt.png}
+    \caption{Fertilizer costs per quintal across clusters}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{clustering_pipeline/output/20250404_boxplot_phyto_costs_2_Qt.png}
+    \caption{Phytosanitary costs per quintal across clusters}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{clustering_pipeline/output/20250404_boxplot_ferti_ratio_over_yield.png}
+    \caption{Fertilizer input ratio over yield across clusters}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{clustering_pipeline/output/20250404_boxplot_phyto_ratio_over_yield.png}
+    \caption{Phytosanitary input ratio over yield across clusters}
+\end{figure}
+
+\clearpage
+
+\section{Conclusion}
+
+The clustering procedure successfully segmented durum wheat farms into coherent groups based on resource use and productivity. The approach combines transparent preprocessing, robust outlier detection, and interpretable feature engineering. The resulting clusters offer a solid foundation for further simulation (e.g., agent-based models), targeted policy design, or exploratory analysis of input-output relationships in agriculture.
 
 \end{document}

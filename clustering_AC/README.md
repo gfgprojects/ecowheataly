@@ -1,6 +1,9 @@
 
 # Clustering Analysis and KPI Computation
 
+> Unsupervised clustering of farm-level agricultural data with automatic KPI extraction and visualization.
+
+
 This project performs clustering analysis on agricultural data to identify patterns and compute cluster-based Key Performance Indicators (KPIs). 
 The script loads a dataset, performs feature engineering, optimizes the number of clusters using the elbow method, and visualizes clustering results.
 
@@ -19,7 +22,8 @@ Before running the code, ensure that you have the following Python libraries ins
 You can install these libraries using pip if they are not already installed:
 
 ```bash
-pip install numpy pandas matplotlib tqdm
+pip install numpy pandas matplotlib tqdm seaborn scikit-learn
+
 ```
 
 ## Project Structure
@@ -76,6 +80,8 @@ The script generates several outputs:
 
 - You can change the input columns used for clustering by modifying the `input_l` list in the script.
 - Modify visualization settings or clustering parameters based on your requirements.
+- The default clustering method is KMeans, but DBSCAN is also supported via parameter modification
+
 
 ### Features engineering
 

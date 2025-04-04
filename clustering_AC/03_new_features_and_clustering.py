@@ -69,7 +69,7 @@ def main(year: int = 2016):
         os.makedirs(output_folder_path)
     
     # Step 1: Load data
-    flat_df = pd.read_csv("clustering_pipeline/data/flat_df.csv")  # Load data into a DataFrame
+    flat_df = pd.read_csv("clustering_pipeline/data/flat_df2.csv")  # Load data into a DataFrame
     
     # Filter data for the selected year
     print(f"Filtering year for selected value: {year}")
@@ -114,11 +114,11 @@ def main(year: int = 2016):
     input_l = [
         # List of clustering input features (some columns are commented out but kept for reference)
         'herbicide_ratio_over_yield', 
-<<<<<<< Updated upstream:clustering_AC/03_new_features_and_clustering.py
+
         'elements_ratio_over_yield',
-=======
+
         'fertilizers_ratio_over_yield',
->>>>>>> Stashed changes:clustering_pipeline/03_new_features_and_clustering.py
+
         'hours_of_machines_ha_over_yield'
     ]
 
@@ -203,7 +203,7 @@ def main(year: int = 2016):
     flat_df["cluster"] = clustered_df["cluster"]
 
     # Step 9: Cluster Visualization
-<<<<<<< Updated upstream:clustering_AC/03_new_features_and_clustering.py
+
     # cols_to_plot = [
     #    'farm_acreage', 
     #    'produced_quantity',
@@ -216,8 +216,8 @@ def main(year: int = 2016):
     #    'hours_of_machines_ha_over_yield'
     # ]
     
-    cols_to_plot = input_l
-=======
+
+
     cols_to_plot = [
        'farm_acreage', 'produced_quantity',
        'crop_acreage', 'hours_of_machines_ha', 
@@ -226,7 +226,6 @@ def main(year: int = 2016):
        'fertilizers_ratio_over_yield',
        'hours_of_machines_ha_over_yield'
     ]
->>>>>>> Stashed changes:clustering_pipeline/03_new_features_and_clustering.py
     
     # Visualize each cluster against specified columns
     for y_col_to_plot in cols_to_plot:
