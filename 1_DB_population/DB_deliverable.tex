@@ -1,0 +1,100 @@
+%! Author = Arianna Di Poola & Gianfranco Giulioni
+%! Date = \today
+
+\documentclass[11pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\geometry{margin=2.5cm}
+
+% Document
+\begin{document}
+
+\title{ECOWHEATALY Database Generation Report}
+\author{Arianna Di Poola \\ Gianfranco Giulioni}
+\date{\today}
+\maketitle
+
+\section*{Objective}
+The script builds the \textbf{ECOWHEATALY} database, a structured JSON file containing detailed farm-level information on wheat production in Italy, based on data from the RICA (Italian FADN) dataset. The goal is to consolidate information about crop production, fertilization, pesticide usage, machinery and labor use, and economic indicators for durum and common wheat producers.
+
+\section*{Input Data}
+The script loads multiple CSV files from the \texttt{Stats/RICA\_DATA} directory:
+
+\begin{itemize}
+    \item \texttt{aziende\_grano.csv}: General farm-level characteristics
+    \item \texttt{colture\_grano.csv}: Crop production and costs
+    \item \texttt{fertilizzanti\_grano.csv}: Fertilizer usage
+    \item \texttt{fitofarmaci\_grano.csv}: Pesticide usage
+    \item \texttt{bilancio\_grano.csv}: Economic balances
+    \item \texttt{certificazioni\_grano.csv}: Certifications
+\end{itemize}
+
+\section*{Processing Steps}
+\begin{enumerate}
+    \item \textbf{Province Name Standardization:} Harmonizes province names for consistency.
+    \item \textbf{Outlier Removal:} (Optional, not implemented here) Uses adjusted boxplot filtering to clean input variables.
+    \item \textbf{Farm Metadata:} For each farm, general info is stored (region, province, orientation, gender, youth).
+    \item \textbf{Yearly Farm Data:} Includes:
+    \begin{itemize}
+        \item Standard output, farm acreage (SAU), machine power
+    \end{itemize}
+    \item \textbf{Wheat Crop Data:} For durum and common wheat:
+    \begin{itemize}
+        \item Quantity, acreage, wheat price, hours of machine use per hectare
+        \item Labor, machinery, fertilizer and pesticide costs
+    \end{itemize}
+    \item \textbf{Fertilizer Classification:} Types grouped (e.g., mineral, organo-mineral) with NPK content.
+    \item \textbf{Pesticide Classification:} Categorized by type and toxicity; only selected classes retained.
+\end{enumerate}
+
+\section*{Database Structure}
+The final JSON \texttt{ecowheataly\_database.json} is a nested dictionary with the structure:
+
+\begin{verbatim}
+{
+  "farm_id": {
+    "region": "...",
+    "province": "...",
+    "technical-economic_orientation": "...",
+    "years": {
+      "2016": {
+        "farm_acreage": ...,
+        "standard_gross_output": ...,
+        "durum_wheat": {
+          "produced_quantity": ...,
+          "fertilizers": {
+            "Mineral": {
+              "nitrogen_ha": ...,
+              ...
+            }
+          },
+          "phytosanitary": {
+            "Herbicide": {
+              3: { "distributed_quantity_ha": ..., ... }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+\end{verbatim}
+
+\section*{Output}
+The JSON file is saved to:
+\begin{verbatim}
+Stats/ecowheataly_database.json
+\end{verbatim}
+It can be used for statistical analysis, sustainability modelling, or visualization.
+
+\section*{Authors}
+Arianna Di Poola \\ Gianfranco Giulioni
+
+\end{document}

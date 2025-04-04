@@ -1,7 +1,8 @@
 #type
-#exec(open("01_create_json_database_for_lca.py").read())
-#to run this script from the python prompt
+#exec(open("01_create_json_database.py").read())
+#to run this script from the python prompt -
 import os
+os.chdir('/Users/aria/Library/CloudStorage/OneDrive-CNR/ECOWHEATALY/dati_RICA_2008_2022')
 import pandas as pd
 import numpy as np
 
@@ -10,28 +11,33 @@ verbose_flag=True
 if verbose_flag: print("Creating ECOWHEATALY database for LCA")
 
 if 'aziende_all' not in locals():
-    
     #import data from excel files
     if verbose_flag: print("Importing data from aziende_grano.csv")
-    aziende_all = pd.read_csv('data/aziende_grano.csv',sep=';',decimal=',');
+    aziende_all = pd.read_csv('aziende_grano.csv',sep=';',decimal=',');
     #aziende_all.columns (shows columns names)
     if verbose_flag: print("Importing data from colture_grano.csv")
-    colture_all = pd.read_csv('data/colture_grano.csv',sep=';',decimal=',');
+    colture_all = pd.read_csv('colture_grano.csv',sep=';',decimal=',');
     if verbose_flag: print("Importing data from fertilizzanti_grano.csv")
-    fertilizzanti_all = pd.read_csv('data/fertilizzanti_grano.csv',sep=';',decimal=',');
+    fertilizzanti_all = pd.read_csv('fertilizzanti_grano.csv',sep=';',decimal=',');
     if verbose_flag: print("Importing data from fitofarmaci_grano.csv")
-    fitofarmaci_all = pd.read_csv('data/fitofarmaci_grano.csv',sep=';',decimal=',');
-    if verbose_flag: print("Importing data from bilancio_grano.csv")
-    ce_all = pd.read_csv('data/bilancio_grano.csv',sep=';',decimal=',');
+    fitofarmaci_all = pd.read_csv('fitofarmaci_grano.csv',sep=';',decimal=',');
+   if verbose_flag: print("Importing data from bilancio_grano.csv")
+   ce_all = pd.read_csv('bilancio_grano.csv',sep=';',decimal=',');
     if verbose_flag: print("Importing data from aiuti_grano.csv")
-    #aiuti_all = pd.read_csv('data/aiuti_grano.csv',sep=';',decimal=',');
-    # if verbose_flag: print("Importing data from Uso_acqua_cereali.xlsx")
-    # acqua_all = pd.read_csv('data/Uso_acqua_cereali.xlsx');
+    #aiuti_all = pd.read_csv('aiuti_grano.csv',sep=';',decimal=',');
+   # if verbose_flag: print("Importing data from Uso_acqua_cereali.xlsx")
+   # acqua_all = pd.read_csv('Uso_acqua_cereali.xlsx');
     if verbose_flag: print("Importing data from certificazioni_grano.csv")
-    certificazioni_all = pd.read_csv('data/certificazioni_grano.csv',sep=';',decimal=',');
+    certificazioni_all = pd.read_csv('certificazioni_grano.csv',sep=';',decimal=',');
+
 
 #farm codes
-farm_codes=aziende_all['Cod_Azienda'].drop_duplicates();
+farm_codes=aziende_all['Cod_Azienda'].drop_duplicates()
+
+# a,b = np.unique(colture_all['PROD_PRINC'],return_counts=True)
+nd = np.where(colture_all['PROD_PRINC']=='ND')[0]
+farm_to_del = colture_all['Cod_Azienda'].iloc[nd].to_numpy()
+farm_codes = farm_codes[~farm_codes.isin(farm_to_del)]
 
 OTE = np.array([
         'Aziende con poliallevamento',
@@ -90,6 +96,7 @@ third_party_machine_makup=0.3
 # # y =  cost_of_own_machines + (contoterzismo /(costi opportunità)(1+0.3))
 for key in datastore:
     tmp_df_ = colture_all.loc[colture_all["Cod_Azienda"] == int(key)].sort_values("Anno")
+    # tmp_df_ = tmp_df_[tmp_df_['PROD_PRINC'] != 'ND']
     # tmp_df_.index=range(tmp_df.shape[0])
 
     for crop, species in [(3, 'durum_wheat'), (4, 'common_wheat')]:
@@ -172,6 +179,104 @@ for key, data in datastore.items():
 
 # --------------------------------------------------------------------------------------
 #Insert data from fitofarmaci.csv in datastore
+# brief statistcs: percentage of data taht will be matched in Biosphere3
+
+# Seleziona solo le colonne di interesse
+df = fitofarmaci_all[['Anno', 'Produzione_Industriale', 'Cod_Specie_Vegetale','Classe_di_Tossicità']]
+# before 2011 there are no data
+df = df[df['Anno'] >= 2011]
+
+
+# Step 1: Translate category names from Italian to English
+categories = {
+    "Fungicide": ["Anticrittogamico"],
+    "Acaricide": ["Acaricida"],
+    "Herbicide": ["Diserbante"],
+    "Insecticide": ["Insetticida"],
+    "GrowthRegulator": ["Fitoregolatore"],
+    "Molluscicide": ["Molluschicida", "Nematocida", "Rodenticida"]  # Unified as Molluscicide
+}
+
+# Step 2: Map toxicity levels to English names
+toxicity_labels = {
+    0: "Caution",
+    1: "Very_Toxic",
+    2: "Toxic",
+    3: "Harmful",
+    4: "Irritating"
+}
+
+# Step 3: Define the variables dictionary (only these combinations should be counted)
+fito_biosphere_exchanges = {
+    "Fungicide_harmful": ("Fungicide", "Harmful"),
+    "Herbicide_caution": ("Herbicide", "Caution"),
+    "Herbicide_irritating": ("Herbicide", "Irritating"),
+    "Herbicide_harmful": ("Herbicide", "Harmful"),
+    "GrowthRegulator_harmful": ("GrowthRegulator", "Harmful"),
+    "Insecticide_harmful": ("Insecticide", "Harmful"),
+    "Insecticide_toxic": ("Insecticide", "Toxic"),
+    "Molluscicide_irritating": ("Molluscicide", "Irritating")
+}
+
+
+# Function to categorize based on 'Produzione_Industriale'
+def assign_category(product_name):
+    product_name = str(product_name).strip().lower()  # Normalize text
+    for category, keywords in categories.items():
+        if product_name in [kw.lower() for kw in keywords]:  # Exact match
+            return category
+    return "Other"  # If it does not match any category
+
+
+# Function to map toxicity level to English
+def map_toxicity(tox_level):
+    return toxicity_labels.get(tox_level, "Unknown")
+
+
+# Apply category and toxicity mapping
+df['Category'] = df['Produzione_Industriale'].apply(assign_category)
+df['Toxicity'] = df['Classe_di_Tossicità'].apply(map_toxicity)
+
+# Loop through species codes [3, 4] and years [2011-2021]
+for specie in [3, 4]:
+    print(f"\n🔍 **Analysis for Cod_Specie_Vegetale = {specie}**\n")
+
+    # Filter for the species
+    df_specie = df[df['Cod_Specie_Vegetale'] == specie].copy()
+
+    # Loop through years 2011-2021
+    for year in np.arange(2011, 2022):
+        print(f"\n📅 **Year: {year}**")
+
+        # Filter for the current year
+        df_year = df_specie[df_specie['Anno'] == year]
+
+        # Count total occurrences for this year
+        total_year = len(df_year)
+
+        if total_year == 0:
+            print("  - No data available for this year.")
+            continue  # Skip if there is no data
+
+        # Filter only relevant category + toxicity combinations
+        df_filtered = df_year[
+            df_year.apply(lambda row: (row['Category'], row['Toxicity']) in fito_biosphere_exchanges.values(), axis=1)]
+
+        if df_filtered.empty:
+            print("  - No matching products found for this year.")
+            continue
+
+        # Compute relevant category-toxicity combinations as percentages
+        combo_counts = df_filtered.groupby(['Category', 'Toxicity']).size() / total_year * 100
+
+        # Print results for each relevant product-toxicity pair
+        for key, (category, toxicity) in fito_biosphere_exchanges.items():
+            if (category, toxicity) in combo_counts:
+                print(f"  📌 {category} - {toxicity}: {combo_counts[(category, toxicity)]:.2f}%")
+
+        # Print the total sum of percentages for the year
+        total_percentage = combo_counts.sum()
+        print(f"  🔷 Total percentage of matched products: {total_percentage:.2f}%")
 
 if verbose_flag: print("... writing pesticides data ...")
 
@@ -191,6 +296,9 @@ for i in types:
     print(i)
 print('---------------------------------------------')
 
+# checks_
+sau = fitofarmaci_all['SAU']
+sau2 = fitofarmaci_all['Quantità_distribuita']/fitofarmaci_all['Quantità_distribuita_per_Ha']
 
 for key in datastore:
     tmp_df_=fitofarmaci_all.loc[fitofarmaci_all["Cod_Azienda"] == int(key)].sort_values("Anno")

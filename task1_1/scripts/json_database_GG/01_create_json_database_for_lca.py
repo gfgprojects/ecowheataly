@@ -1,5 +1,5 @@
 #type
-#exec(open("01_create_json_database_for_lca.py").read())
+#exec(open("01_create_json_database.py").read())
 #to run this script from the python prompt
 
 import pandas as pd;
