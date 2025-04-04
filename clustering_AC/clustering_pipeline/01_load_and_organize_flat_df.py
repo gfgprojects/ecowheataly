@@ -348,5 +348,5 @@ for T, TYPE in enumerate(types):
     plt.title(TYPE)
 
 
-df.to_csv("clustering_AC/clustering_pipeline/data/flat_df2.csv", index=False)
+df.to_csv("clustering_AC/clustering_pipeline/data/flat_df.csv", index=False)
 
