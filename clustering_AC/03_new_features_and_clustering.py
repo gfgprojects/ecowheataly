@@ -101,7 +101,7 @@ def main(year: int = 2016):
     # Define columns representing essential elements for crop nutrition
     elements_cols = ['nitrogen_ha', 'phosphorus_ha', 'potassium_ha']
     # Calculate total elements ratio over yield
-    flat_df["elements_ratio_over_yield"] = (
+    flat_df["fertilizers_ratio_over_yield"] = (
         flat_df[elements_cols].sum(axis=1) / flat_df["farm_yield"]
     )
 
@@ -114,7 +114,11 @@ def main(year: int = 2016):
     input_l = [
         # List of clustering input features (some columns are commented out but kept for reference)
         'herbicide_ratio_over_yield', 
+<<<<<<< Updated upstream:clustering_AC/03_new_features_and_clustering.py
         'elements_ratio_over_yield',
+=======
+        'fertilizers_ratio_over_yield',
+>>>>>>> Stashed changes:clustering_pipeline/03_new_features_and_clustering.py
         'hours_of_machines_ha_over_yield'
     ]
 
@@ -134,7 +138,7 @@ def main(year: int = 2016):
 
     # Step 6: Clustering Analysis
     result_l = []  # List to store clustering results
-    for k in tqdm(range(5, 150, 5)):  # Iterate over a range of cluster sizes
+    for k in tqdm(range(5, 150, 1)):  # Iterate over a range of cluster sizes
     
         # Analyze clusters for the current number of clusters (k)
         _, _, silhouette_score, inertia = clustering.analyze_clusters(
@@ -174,11 +178,12 @@ def main(year: int = 2016):
 
     # Step 8: Final Clustering with Optimal k
     clustered_df, unique_labels, silhouette_score, inertia = clustering.analyze_clusters(
-        df=flat_df.filter(input_l),
+        df=flat_df.filter(input_l + ["farm code"]),
         remove_outliers=True,
         y_col_to_plot="herbicide_ratio_over_yield",
         k=optimal_k,
-        plot_clusters=False
+        plot_clusters=False,
+        index_col="farm code"
     )
 
     # Generate statistics for each cluster
@@ -198,6 +203,7 @@ def main(year: int = 2016):
     flat_df["cluster"] = clustered_df["cluster"]
 
     # Step 9: Cluster Visualization
+<<<<<<< Updated upstream:clustering_AC/03_new_features_and_clustering.py
     # cols_to_plot = [
     #    'farm_acreage', 
     #    'produced_quantity',
@@ -211,6 +217,16 @@ def main(year: int = 2016):
     # ]
     
     cols_to_plot = input_l
+=======
+    cols_to_plot = [
+       'farm_acreage', 'produced_quantity',
+       'crop_acreage', 'hours_of_machines_ha', 
+       'nitrogen_ha', 'herbicide_ratio',
+       'herbicide_ratio_over_yield', 
+       'fertilizers_ratio_over_yield',
+       'hours_of_machines_ha_over_yield'
+    ]
+>>>>>>> Stashed changes:clustering_pipeline/03_new_features_and_clustering.py
     
     # Visualize each cluster against specified columns
     for y_col_to_plot in cols_to_plot:

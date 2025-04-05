@@ -1,0 +1,122 @@
+{
+    "0": {
+        "size": 220,
+        "herbicide_ratio_over_yield": {
+            "mean": 0.013048330102150165,
+            "std": 0.013502196227002036
+        },
+        "elements_ratio_over_yield": {
+            "mean": -9.416287429223589,
+            "std": 14.04818922309434
+        },
+        "hours_of_machines_ha_over_yield": {
+            "mean": 0.7117455899816929,
+            "std": 0.1626561214097738
+        }
+    },
+    "1": {
+        "size": 364,
+        "herbicide_ratio_over_yield": {
+            "mean": 0.014269846694619694,
+            "std": 0.013300453163564168
+        },
+        "elements_ratio_over_yield": {
+            "mean": -0.8768541490509053,
+            "std": 7.789157873320275
+        },
+        "hours_of_machines_ha_over_yield": {
+            "mean": 0.22947221052123262,
+            "std": 0.11271064205876212
+        }
+    },
+    "2": {
+        "size": 414,
+        "herbicide_ratio_over_yield": {
+            "mean": 0.01142687632013408,
+            "std": 0.010223923591044914
+        },
+        "elements_ratio_over_yield": {
+            "mean": -32.85081359946492,
+            "std": 9.087427411811019
+        },
+        "hours_of_machines_ha_over_yield": {
+            "mean": 0.28725410820728864,
+            "std": 0.13982385350976193
+        }
+    },
+    "3": {
+        "size": 66,
+        "herbicide_ratio_over_yield": {
+            "mean": 0.11195363193446782,
+            "std": 0.027321804136890664
+        },
+        "elements_ratio_over_yield": {
+            "mean": -27.190197126068945,
+            "std": 17.78659157834259
+        },
+        "hours_of_machines_ha_over_yield": {
+            "mean": 0.3410966870027224,
+            "std": 0.2196446787070882
+        }
+    },
+    "4": {
+        "size": 202,
+        "herbicide_ratio_over_yield": {
+            "mean": 0.009814418951681269,
+            "std": 0.014896119196141559
+        },
+        "elements_ratio_over_yield": {
+            "mean": -68.7233347563976,
+            "std": 15.543461004036004
+        },
+        "hours_of_machines_ha_over_yield": {
+            "mean": 0.5721552888101175,
+            "std": 0.2570238923678588
+        }
+    },
+    "5": {
+        "size": 255,
+        "herbicide_ratio_over_yield": {
+            "mean": 0.045178212457627535,
+            "std": 0.013779396911710795
+        },
+        "elements_ratio_over_yield": {
+            "mean": -44.17996751375493,
+            "std": 13.356427121686572
+        },
+        "hours_of_machines_ha_over_yield": {
+            "mean": 0.28973623636668233,
+            "std": 0.17391532098560464
+        }
+    },
+    "6": {
+        "size": 82,
+        "herbicide_ratio_over_yield": {
+            "mean": 0.015891507404140887,
+            "std": 0.01608343760212301
+        },
+        "elements_ratio_over_yield": {
+            "mean": -18.930329028382815,
+            "std": 20.866103111789283
+        },
+        "hours_of_machines_ha_over_yield": {
+            "mean": 1.4493064353967096,
+            "std": 0.2543941854973267
+        }
+    },
+    "7": {
+        "size": 145,
+        "herbicide_ratio_over_yield": {
+            "mean": 0.06768883975611596,
+            "std": 0.015667784397363813
+        },
+        "elements_ratio_over_yield": {
+            "mean": -4.014198276740473,
+            "std": 12.492121047122735
+        },
+        "hours_of_machines_ha_over_yield": {
+            "mean": 0.4540214029999106,
+            "std": 0.25013099891066753
+        }
+    }
+}

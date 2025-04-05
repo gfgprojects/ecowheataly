@@ -89,7 +89,6 @@ def perform_clustering(df: pd.DataFrame, method: str, k: int) -> Tuple[pd.DataFr
     scaler = StandardScaler()
     scaled_features = scaler.fit_transform(df)
     
-    
     if method == "dbscan":
         print(f"Method is {method}...")
         dbscan = DBSCAN()
@@ -178,7 +177,8 @@ def analyze_clusters(
         remove_outliers: bool = True,
         y_col_to_plot: str = 'resa [qt/ha',
         k : int = None,
-        plot_clusters: bool = True
+        plot_clusters: bool = True,
+        index_col : str = None
         ) -> Tuple[pd.DataFrame, np.ndarray]:
     """
     Perform a complete cluster analysis from data loading to visualization.
@@ -189,6 +189,9 @@ def analyze_clusters(
     Returns:
         Tuple[pd.DataFrame, np.ndarray]: Modified DataFrame with cluster labels and unique cluster labels.
     """
+    
+    if index_col:
+        df = df.set_index(index_col)
 
     df_filtered = detect_outliers(df, method="isolation_forest") if remove_outliers else df
     # df_filtered = detect_outliers(df, method="svm") if remove_outliers else df
