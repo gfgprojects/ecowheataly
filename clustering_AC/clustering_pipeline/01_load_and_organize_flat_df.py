@@ -22,7 +22,7 @@ with open("1_DB_population/ecowheataly_database.json") as ewdj:
 
 # anno, colture, Frumento duro, fertilizzanti, fitofarmaci
 wheat_vars = ['produced_quantity','PLV','crop_acreage','hours_of_machines_ha','fert_costs','phyto_costs',
-              'human_costs','machinery_costs','wheat_price']
+              'energy_costs','thirdy_costs', 'human_costs','machinery_costs','wheat_price']
 # fertilizzanti, fitofarmaci
 fert_vars_type = ['Mineral','OrganoMineral','Other','Micro_Mineral']
 fert_vars = ['fert_area','whole_qt_ha','unit_cost','distribuited_value',
@@ -282,7 +282,7 @@ cols = flat_df.columns[3::]
 plt.boxplot(flat_df[cols],labels = cols)
 plt.xticks(rotation = 90)
 
-selected_cols = ['PLV', 'fert_costs', 'phyto_costs','human_costs', 'machinery_costs',
+selected_cols = ['PLV', 'fert_costs', 'phyto_costs','human_costs','thirdy_costs', 'machinery_costs',
                  'Mineral_distribuited_value','Mineral_nitrogen_ha']
 
 for c in selected_cols:

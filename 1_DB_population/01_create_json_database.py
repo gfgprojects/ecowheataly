@@ -21,6 +21,7 @@ Author: Arianna Di Poola & Gianfranco Giulioni
 
 import pandas as pd
 import numpy as np
+
 from matplotlib import pyplot as plt
 
 
@@ -227,6 +228,8 @@ for key in datastore:
                 "hours_of_machines_ha": round(hours_of_machines_ha,2),
                 "fert_costs": float(tmp_df.loc[runner, "Concimi"]),
                 "phyto_costs": float(tmp_df.loc[runner, "Difesa"]),
+                "energy_costs": float(tmp_df.loc[runner,'Energia']),
+                "thirdy_costs": float(tmp_df.loc[runner, 'Contoterzismo']),
                 "human_costs": float(tmp_df.loc[runner, "Costo_Lav_Uomo"]),
                 "machinery_costs": float(tmp_df.loc[runner, "Costo_Lav_Macchine"]),
                 "wheat_price" : round(wheat_price,2)
