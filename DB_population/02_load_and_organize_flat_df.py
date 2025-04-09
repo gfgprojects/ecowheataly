@@ -17,7 +17,7 @@ import json
 import numpy as np
 import pandas as pd
 
-with open("1_DB_population/ecowheataly_database.json") as ewdj:
+with open("DB_population/ecowheataly_database.json") as ewdj:
     data = json.load(ewdj)
 
 # anno, colture, Frumento duro, fertilizzanti, fitofarmaci
@@ -41,44 +41,7 @@ for key, val in data.items():
     farms.append(key)
 farms = np.array(farms)
 
-## part 1 -  general data + fertilizers†
-
-# # --------- TEST SCRIPT FOR A SINGLE YEAR -----------------------
-# anno1 = '2011'
-# Vars_name = ['year', 'farm code','farm_acreage','species'] + wheat_vars + fert_vars
-# species = 'durum_wheat'
-# Mat = []
-# for i,fid in enumerate(farms):
-#     # print(data[fid]['years'][anno1]['colture']['Frumento duro'])
-#     try:
-#         # -----------EXTRACT GENERAL DATA----------------------------------------
-#         farm_acreage = data[fid]['years'][anno1]['farm_acreage']
-#         crop = data[fid]['years'][anno1][species]
-#         row = [anno1, fid,farm_acreage,species]
-#         # extract data within crop_level keys (quantity,acreage,hours_of_machines) if available, otherwise insert 0
-#         row.extend(crop.get(key, 0) for key in wheat_vars)
-#     # -------------------- checks forn inf
-#     #     if row[-1]> 1000:
-#     #         print(fid,row[-1])
-#     # except KeyError:
-#     #     pass
-#
-#         #---------- EEXTRACT DATA ON FERTILIZERS
-#         fertilizers = crop['fertilizers']
-#         # extract data within crop_level keys (quantity,acreage,hours_of_machines) if available, otherwise insert 0
-#         row.extend(fertilizers.get(key, 0) for key in fert_vars)
-#         # CHECK THE COEHERENCE
-#         if len(row) != len(Vars_name):
-#             print(i, fid)
-#         # Mat.append(mat)
-#         Mat.append(row)
-#     except KeyError:
-#         pass
-#
-#
-# Mat = np.array(Mat)
-# df = pd.DataFrame(Mat,columns=Vars_name)
-# # ------------------------------------------------------------------------------
+## part 1 -  general data
 
 # -------------- PUT THE SCRIPT INTO A FUNCTION----------------------------
 def extract_data(data, anno, farms, wheat_vars, species='durum_wheat'):
@@ -94,10 +57,6 @@ def extract_data(data, anno, farms, wheat_vars, species='durum_wheat'):
 
             # extract data recalled in wheat_vars
             row.extend(crop.get(key, 0) for key in wheat_vars)
-
-            # # extract data recalled in fert_vars
-            # fertilizers = crop['fertilizers']
-            # row.extend(fertilizers.get(key, 0) for key in fert_vars)
 
             data_list.append(row)
         except KeyError:
@@ -138,7 +97,6 @@ df1 = pd.DataFrame(Mat,columns=Vars_name)
 dtypes1 = {col: 'int' if i < 2 else 'float' if i == 3 else 'str' if i == 2 else 'float' for i, col in enumerate(df1.columns)}
 df1 = df1.astype(dtypes1)
 
-
 # NOTES:
 # >> manage the "inf" in the hours_of_machines (due to 0 costs in the Azienda.scv files)
 
@@ -170,8 +128,6 @@ for year in years:
         Mat2.append(row)
 
 # Convert to DataFrame
-
-
 df_colname  = ['year','farm code']
 for t in fert_vars_type:
     for c in fert_vars:
@@ -183,7 +139,6 @@ df2 = df2.astype(dtypes2)
 
 ## PART 3 : Pythosanitary
 
-
 types  =['Herbicide', 'Insecticide', 'Fungicide']
 ColName = ['year','farm code','Qt Tox-0','Qt Tox-1','Qt Tox-2','Qt Tox-3','Qt Tox-4']
 Mat3 = []
@@ -191,7 +146,6 @@ for T,TYPE in enumerate(types):
     print(f'organizzando {TYPE}')
     mat = []
     for year in years:
-        print(year)
         for i, fid in enumerate(farms):
             try:
                 # ------------prova 1----------------------------------------
@@ -253,53 +207,166 @@ df3 = df3.astype(dtypes3)
 df3.fillna(0, inplace=True) #cheked! nan are 0 uses
 
 
-
 ## MERGING df1 with df2
-
 
 temp_df = pd.merge(df1, df2, on=['year', 'farm code'], how='left')
 flat_df = pd.merge(temp_df,df3,on=['year', 'farm code'], how='left' )
-# where there are no data on Phytosanitary means that the farm didn't use it in that year
-# hence we insert 0 and 0 must be kept as good value!
-# flat_df.fillna(np.nan, inplace=True)
+
 
 
 ## ===================== FILTERING ===========================
-from clustering_AC.clustering_pipeline.flat_utils import clean_and_plot
+from DB_population.flat_utils  import remove_outliers_adjusted_boxplot
+import gc
 
-np.shape(flat_df)
-np.shape(flat_df.dropna())
-for year in years:
-    temp = flat_df[flat_df['year']==year]
-    print(f'in year {year} there are: ')
-    print (f'{np.shape(temp)[0]} observations...')
-    print(f'{np.shape(temp.dropna())[0]} observations with "finite" data...')
-    print(f' and {len(temp.dropna()["farm code"].unique())} farms producing {species}')
-
+# BEFORE CLEANING:  Let see some numbers about the size of flat_df
 from matplotlib import pyplot as plt
 cols = flat_df.columns[3::]
+sel_cols =[]
+Mat = []
+from scipy.stats import skew
+for c in cols:
+    temp = flat_df[c]
+    data_skew = skew(temp.dropna())
+    if abs(data_skew) > 0.2:
+         sel_cols.append(c)
+    Mat.append(temp[temp>0])
 
-plt.boxplot(flat_df[cols],labels = cols)
+plt.boxplot(Mat,labels = cols)
 plt.xticks(rotation = 90)
+plt.tight_layout()
 
-selected_cols = ['PLV', 'fert_costs', 'phyto_costs','human_costs','thirdy_costs', 'machinery_costs',
-                 'Mineral_distribuited_value','Mineral_nitrogen_ha']
+sel_cols=['produced_quantity', 'PLV',
+        'fert_costs', 'phyto_costs',
+       'thirdy_costs', 'human_costs', 'machinery_costs', 'Mineral_nitrogen_ha']
 
-for c in selected_cols:
-    # Salta colonne con troppi zeri
-    zero_ratio = (flat_df[c] == 0).sum() / len(flat_df[c] )
-    print(f'{c} : {np.round(zero_ratio,2)}')
-# df = clean_and_plot(flat_df,cols, plot=True, title_prefix="DB")
+log1_records = []
+ # Informazioni sulle dimensioni iniziali
+initial_shape = flat_df.shape
+finited_shape = flat_df.dropna().shape
 
-
-df = clean_and_plot(flat_df,selected_cols, plot=True, title_prefix="DB")
+log1_records = []
+# Per ogni anno
 for year in years:
-    temp = df[df['year']==year]
-    print(f'in year {year} there are: ')
-    print (f'{np.shape(temp)[0]} observations...')
-    print(f'{np.shape(temp.dropna())[0]} observations with "finite" data...')
-    print(f' and {len(temp.dropna()["farm code"].unique())} farms producing {species}')
-# ===========================================================
+    temp = flat_df[flat_df['year'] == year]
+    n_total = temp.shape[0]
+    n_finite = temp.dropna().shape[0]
+    n_farms = len(temp.dropna()['farm code'].unique())
+
+    log1_records.append({
+        "year": year,
+        "n_obs": n_total,
+        "n_finite": n_finite,
+        "n_farms": n_farms,
+    })
+log1_rec = pd.DataFrame(log1_records)
+
+# CLEANING DATA AND REPORTETING
+# from sklearn.ensemble import IsolationForest
+
+
+log2_records=[]
+# for batch in range(0, len(cols), 5):
+#     for c in cols[batch:batch+5]:
+for c in sel_cols:
+    print(f"********** Analysing variable {c} ********************")
+
+    temp = flat_df[c].copy()
+    n_obs =  temp.shape[0]
+    n_finite_before =  temp.dropna().shape[0]
+    # iso_forest = IsolationForest(contamination=0.1, random_state=42)
+    # iso_forest.fit(temp.to_numpy().reshape(-1, 1))
+    # # Predizione: -1 = outlier, 1 = normale
+    # outliers = iso_forest.predict(temp.to_numpy().reshape(-1, 1))
+    # print(len(outliers[outliers==-1]))
+       # var= temp.copy()
+    # var[outliers == -1] = np.nan
+    var = remove_outliers_adjusted_boxplot(temp)
+    flat_df[c] = var
+    n_finite_after = var.dropna().shape[0]
+    num_zeri = var.eq(0).sum()
+    gc.collect()
+
+    log2_records.append({
+        "variable": c,
+        "n_obs": n_obs,
+        "n_finite_before": n_finite_before,
+        "n_finite_after": n_finite_after,
+        "n_outliers" : n_finite_before - n_finite_after,
+        "n_zeros": num_zeri
+    })
+log2_rec = pd.DataFrame(log2_records)
+
+# LAST BUT NON LEAST: HANDINGL ZEROS IN AREA AND PLV:
+for c in cols[1:4]:
+    zero_rows = flat_df[c] == 0  # Maschera booleana per righe con 0 in colonna `c`
+    num_zeri = zero_rows.sum()
+    print(f"In '{c}' remain {num_zeri} zeros that are put to NaN in entire rows")
+    # Sostituisce tutte le celle dell'intera riga con NaN dove `c == 0`
+    flat_df.loc[zero_rows, :] = np.nan
+
+log3_records = []
+# Per ogni anno
+for year in years:
+    temp = flat_df[flat_df['year'] == year]
+    n_total = temp.shape[0]
+    n_finite = temp.dropna().shape[0]
+    n_farms = len(temp.dropna()['farm code'].unique())
+
+    log3_records.append({
+        "year": year,
+        "n_obs": n_total,
+        "n_finite": n_finite,
+        "n_farms": n_farms,
+    })
+log3_rec = pd.DataFrame(log3_records)
+log3_rec.insert(loc=2, column='n_finite_before', value=log1_rec['n_finite'])
+# Esportazione in tabella LaTeX
+# log_df.to_latex("report_outlier_summary.tex", index=False, na_rep='')
+
+
+
+MatNew = []
+
+for c in cols:
+    temp = flat_df[c]
+    MatNew.append(temp[temp>0])
+
+plt.subplot(1,2,1)
+plt.boxplot(Mat,labels = cols)
+plt.xticks(rotation = 90)
+plt.tight_layout()
+plt.title('before cleaning')
+plt.subplot(1,2,2)
+plt.boxplot(MatNew,labels = cols)
+plt.xticks(rotation = 90)
+plt.tight_layout()
+plt.title('after  cleaning')
+
+# np.shape(flat_df)
+# np.shape(flat_df.dropna())
+# for year in years:
+#     temp = flat_df[flat_df['year']==year]
+#     print(f'in year {year} there are: ')
+#     print (f'{np.shape(temp)[0]} observations...')
+#     print(f'{np.shape(temp.dropna())[0]} observations with "finite" data...')
+#     print(f' and {len(temp.dropna()["farm code"].unique())} farms producing {species}')
+
+
+
+# import gc
+# #HANDING OUTLIERS (use batch sample to avoid oversaturation of the harddisk)
+# for batch in range(0,len(cols),5):
+#     for c in cols[batch:batch+5]:
+#         print(f'********** analysing variable {c} ********************')
+#         temp = flat_df[c]
+#         var = remove_outliers_adjusted_boxplot(temp)
+#         flat_df[c]=temp
+#         gc.collect()
+
+# Esportazione in LaTeX
+log3_rec.to_latex("DB_population/tabella_output.tex", index=False, encoding='utf-8')
+
+!dos2unix DB_population/tabella_output.tex
 
 
 
@@ -348,5 +415,5 @@ for T, TYPE in enumerate(types):
     plt.title(TYPE)
 
 
-df.to_csv("clustering_AC/clustering_pipeline/data/flat_df.csv", index=False)
+flat_df.to_csv("DB_population/flat_df.csv", index=False)
 

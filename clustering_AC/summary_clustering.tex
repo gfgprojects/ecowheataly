@@ -31,6 +31,32 @@ All collected data are merged by farm and year into a single DataFrame. Missing 
 
 The result is a flattened, cleaned panel dataset saved as \texttt{flat\_df2.csv}, which serves as the input for machine learning and clustering tasks.
 
+To further refine the dataset and mitigate the impact of extreme values, a robust outlier detection procedure was applied to a selected set of continuous numeric variables using an adjusted boxplot method. This approach extends the classic Tukey rule by incorporating an asymmetry correction based on the \textit{simplified medcouple}, a robust estimator of skewness. This allows for more reliable outlier identification in variables that exhibit significant skew.
+
+The variables subjected to this cleaning step are:
+
+\begin{itemize}
+    \item \texttt{crop\_acreage}
+    \item \texttt{produced\_quantity}
+    \item \texttt{PLV} (Production value)
+    \item \texttt{hours\_of\_machines\_ha}
+    \item \texttt{fert\_costs}
+    \item \texttt{phyto\_costs}
+    \item \texttt{human\_costs}
+    \item \texttt{thirdy\_costs}
+    \item \texttt{machinery\_costs}
+    \item \texttt{Mineral\_distribuited\_value}
+    \item \texttt{OrganoMineral\_distribuited\_value}
+    \item \texttt{Mineral\_nitrogen\_ha}
+    \item \texttt{Other\_distribuited\_value}
+\end{itemize}
+
+For each of these columns, extreme values are flagged as outliers based on their deviation from adjusted interquartile fences, which are scaled asymmetrically depending on the estimated skewness of the distribution. If the data are approximately symmetric (i.e., skewness below a threshold of 0.2), the standard Tukey fences are applied. Otherwise, the method adapts the lower and upper bounds by exponential factors informed by the direction and intensity of the skewness.
+
+All flagged outliers are removed from the dataset to ensure statistical robustness and improve the stability of downstream modeling tasks. This filtering step reduces the influence of anomalous observations resulting from reporting errors, extreme agronomic conditions, or structural inconsistencies in the source data.
+
+
+
 \section{Preliminary Exploration}
 
 Before clustering, a preliminary exploration helps assess completeness and highlight potential dimensions of heterogeneity. For each year, we compute the number of available observations, the count of complete records, and the number of farms cultivating durum wheat. A zero-ratio analysis reveals the proportion of farms with zero values for key inputs like \texttt{fert\_costs}, \texttt{phyto\_costs}, or nutrient application, shedding light on possible differences in farming strategies or data sparsity.

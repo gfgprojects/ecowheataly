@@ -24,16 +24,13 @@ In the example inputs data (text data in CSV format) are already standardized in
 """
 
 import numpy as np
-from matplotlib import pyplot as plt
-import os
 import pandas  as pd
 from matplotlib import pyplot as plt
-from scipy.stats import gamma, pearson3, norm
+from scipy.stats import gamma, norm
 
 # PUT HERE THE PATH OF THE DIRECTORY WITH DATA
 
 from Cindex.utils import Cindex
-from sklearn.preprocessing import StandardScaler
 
 # ------------------------------------------------------------------------------
 # Load the test data:

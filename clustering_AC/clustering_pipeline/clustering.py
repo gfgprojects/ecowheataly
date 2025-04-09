@@ -62,7 +62,7 @@ def detect_outliers(df: pd.DataFrame, method: str = "isolation_forest") -> pd.Da
 
 		print("Using Isolation Forest...")
 
-		df['is_anomaly'] = IsolationForest(random_state=0).fit_predict(df)
+		df['is_anomaly'] = IsolationForest(contamination=0.1,random_state=0).fit_predict(df)
 
 	else:
 
