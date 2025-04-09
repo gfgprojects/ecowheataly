@@ -213,6 +213,82 @@ temp_df = pd.merge(df1, df2, on=['year', 'farm code'], how='left')
 flat_df = pd.merge(temp_df,df3,on=['year', 'farm code'], how='left' )
 
 
+## Add some extra columns
+
+# Calculate farm yield as produced quantity per crop acreage
+flat_df = flat_df.assign(
+	crop_yield=lambda x: x.produced_quantity / x.crop_acreage
+)
+
+print('crop yield cannot be zero: removing few rows...')
+flat_df.loc[flat_df['crop_yield'] == 0, 'crop_yield'] = np.nan
+
+
+print('Hours of machine has few inf... let us remove them')
+n_inf = np.isinf(flat_df.iloc[:,4::].astype(float)).sum()
+flat_df.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+# Normalize some vslues:
+flat_df["PLV_2_Qt"] = flat_df['PLV'] / flat_df['produced_quantity']
+
+
+flat_df["phyto_costs_2_Qt"] = flat_df['phyto_costs'] / flat_df['produced_quantity']
+
+
+flat_df["fert_costs_2_Qt"] = flat_df['fert_costs'] / flat_df['produced_quantity']
+
+
+
+
+# ======= PYTHO AGGREGATION and Normaliztion to acrage==============================
+# Step 2: Basic Feature Engineering
+# Identify all columns related to herbicides
+herbicide_cols = [elem for elem in flat_df.columns if "Herbicide_Qt" in elem]
+# Compute the herbicide ratio relative to crop acreage
+flat_df["herbicide_ha"] = (
+		flat_df[herbicide_cols].sum(axis=1) / flat_df["crop_acreage"]
+)
+
+insecticide_cols = [elem for elem in flat_df.columns if "Insecticide_Qt" in elem]
+# Compute the herbicide ratio relative to crop acreage
+flat_df["insecticide_ha"] = (
+		flat_df[insecticide_cols].sum(axis=1) / flat_df["crop_acreage"]
+)
+
+fungicide_cols = [elem for elem in flat_df.columns if "Fungicide_Qt" in elem]
+# Compute the herbicide ratio relative to crop acreage
+flat_df["fungicide_ha"] = (
+		flat_df[fungicide_cols].sum(axis=1) / flat_df["crop_acreage"]
+)
+
+# Step 3: Performance Ratios
+# Calculate the ratio of herbicide use relative to yield
+flat_df["herbicide_inefficiency"] = flat_df["herbicide_ha"] / flat_df["crop_yield"]
+flat_df["insecticide_inefficiency"] = flat_df["insecticide_ha"] / flat_df["crop_yield"]
+flat_df["fungicide_inefficiency"] = flat_df["fungicide_ha"] / flat_df["crop_yield"]
+
+phyto_cols = ["herbicide_inefficiency","insecticide_inefficiency","fungicide_inefficiency"]
+flat_df["phyto_inefficiency"] = (
+		flat_df[phyto_cols].sum(axis=1)
+)
+
+# ======= Ferti AGGREGATION and Normaliztion to acrage==============================
+# Define columns representing essential elements for crop nutrition
+keywords = ['nitrogen_ha', 'phosphorus_ha', 'potassium_ha']
+new_cols = ['N_ha','P_ha','K_ha']
+for k,c in zip(keywords,new_cols):
+	x_cols = [elem for elem in flat_df.columns if k in elem]
+	flat_df[c] = flat_df[x_cols].sum(axis=1)/ flat_df["crop_yield"]
+
+
+# Calculate total elements ratio over yield
+flat_df["ferti_inefficiency"] = flat_df[new_cols].sum(axis=1)
+
+# Calculate hours of machinery use per hectare relative to yield
+flat_df["hours_of_machines_inefficiency"] = (
+		flat_df["hours_of_machines_ha"] / flat_df["crop_yield"]
+)
+
 
 ## ===================== FILTERING ===========================
 from DB_population.flat_utils  import remove_outliers_adjusted_boxplot
@@ -235,9 +311,12 @@ plt.boxplot(Mat,labels = cols)
 plt.xticks(rotation = 90)
 plt.tight_layout()
 
+# NB phyto_inefficiency' and ferti_inefficiency fa da cappello per tutte le colonne sui fito e fertilizzanti!
 sel_cols=['produced_quantity', 'PLV',
         'fert_costs', 'phyto_costs',
-       'thirdy_costs', 'human_costs', 'machinery_costs', 'Mineral_nitrogen_ha']
+       'thirdy_costs', 'human_costs', 'machinery_costs', 'Mineral_nitrogen_ha',
+          'crop_yield',  'phyto_inefficiency', 'ferti_inefficiency',
+          'hours_of_machines_inefficiency']
 
 log1_records = []
  # Informazioni sulle dimensioni iniziali
@@ -320,6 +399,8 @@ for year in years:
     })
 log3_rec = pd.DataFrame(log3_records)
 log3_rec.insert(loc=2, column='n_finite_before', value=log1_rec['n_finite'])
+log3_rec = log3_rec.drop('n_farms', axis=1)
+log3_rec['n_deletion'] = log3_rec['n_finite_before'] -log3_rec['n_finite']
 # Esportazione in tabella LaTeX
 # log_df.to_latex("report_outlier_summary.tex", index=False, na_rep='')
 

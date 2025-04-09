@@ -24,73 +24,73 @@ if flat_df.empty:
 	raise Exception(
 		f"Emtpy DataFram with year {year}. Please, select another value."
 	)
-
-# Calculate farm yield as produced quantity per crop acreage
-flat_df = flat_df.assign(
-	farm_yield=lambda x: x.produced_quantity / x.crop_acreage
-)
-
-# Normalize some vslues:
-flat_df["PLV_2_Qt"] = flat_df['PLV'] / flat_df['produced_quantity']
-
-
-flat_df["phyto_costs_2_Qt"] = flat_df['phyto_costs'] / flat_df['produced_quantity']
-
-
-flat_df["fert_costs_2_Qt"] = flat_df['fert_costs'] / flat_df['produced_quantity']
-
-
-
-
-# ======= PYTHO AGGREGATION and Normaliztion to acrage==============================
-# Step 2: Basic Feature Engineering
-# Identify all columns related to herbicides
-herbicide_cols = [elem for elem in flat_df.columns if "Herbicide_Qt" in elem]
-# Compute the herbicide ratio relative to crop acreage
-flat_df["herbicide_ratio"] = (
-		flat_df[herbicide_cols].sum(axis=1) / flat_df["crop_acreage"]
-)
-
-insecticide_cols = [elem for elem in flat_df.columns if "Insecticide_Qt" in elem]
-# Compute the herbicide ratio relative to crop acreage
-flat_df["insecticide_ratio"] = (
-		flat_df[insecticide_cols].sum(axis=1) / flat_df["crop_acreage"]
-)
-
-fungicide_cols = [elem for elem in flat_df.columns if "Fungicide_Qt" in elem]
-# Compute the herbicide ratio relative to crop acreage
-flat_df["fungicide_ratio"] = (
-		flat_df[fungicide_cols].sum(axis=1) / flat_df["crop_acreage"]
-)
-
-# Step 3: Performance Ratios
-# Calculate the ratio of herbicide use relative to yield
-flat_df["herbicide_ratio_over_yield"] = flat_df["herbicide_ratio"] / flat_df["farm_yield"]
-flat_df["insecticide_ratio_over_yield"] = flat_df["insecticide_ratio"] / flat_df["farm_yield"]
-flat_df["fungicide_ratio_over_yield"] = flat_df["fungicide_ratio"] / flat_df["farm_yield"]
-
-phyto_cols = ["herbicide_ratio_over_yield","insecticide_ratio_over_yield","fungicide_ratio_over_yield"]
-flat_df["phyto_ratio_over_yield"] = (
-		flat_df[phyto_cols].sum(axis=1)
-)
-
-# ======= Ferti AGGREGATION and Normaliztion to acrage==============================
-# Define columns representing essential elements for crop nutrition
-keywords = ['nitrogen_ha', 'phosphorus_ha', 'potassium_ha']
-new_cols = ['Nha_ratio','Pha_ratio','Kha_ratio']
-for k,c in zip(keywords,new_cols):
-	x_cols = [elem for elem in flat_df.columns if k in elem]
-	flat_df[c] = flat_df[x_cols].sum(axis=1)/ flat_df["farm_yield"]
-
-
-# Calculate total elements ratio over yield
-flat_df["ferti_ratio_over_yield"] = flat_df[new_cols].sum(axis=1)
-
-# Calculate hours of machinery use per hectare relative to yield
-flat_df["hours_of_machines_ha_over_yield"] = (
-		flat_df["hours_of_machines_ha"] / flat_df["farm_yield"]
-)
-
+#
+# # Calculate farm yield as produced quantity per crop acreage
+# flat_df = flat_df.assign(
+# 	farm_yield=lambda x: x.produced_quantity / x.crop_acreage
+# )
+#
+# # Normalize some vslues:
+# flat_df["PLV_2_Qt"] = flat_df['PLV'] / flat_df['produced_quantity']
+#
+#
+# flat_df["phyto_costs_2_Qt"] = flat_df['phyto_costs'] / flat_df['produced_quantity']
+#
+#
+# flat_df["fert_costs_2_Qt"] = flat_df['fert_costs'] / flat_df['produced_quantity']
+#
+#
+#
+#
+# # ======= PYTHO AGGREGATION and Normaliztion to acrage==============================
+# # Step 2: Basic Feature Engineering
+# # Identify all columns related to herbicides
+# herbicide_cols = [elem for elem in flat_df.columns if "Herbicide_Qt" in elem]
+# # Compute the herbicide ratio relative to crop acreage
+# flat_df["herbicide_ratio"] = (
+# 		flat_df[herbicide_cols].sum(axis=1) / flat_df["crop_acreage"]
+# )
+#
+# insecticide_cols = [elem for elem in flat_df.columns if "Insecticide_Qt" in elem]
+# # Compute the herbicide ratio relative to crop acreage
+# flat_df["insecticide_ratio"] = (
+# 		flat_df[insecticide_cols].sum(axis=1) / flat_df["crop_acreage"]
+# )
+#
+# fungicide_cols = [elem for elem in flat_df.columns if "Fungicide_Qt" in elem]
+# # Compute the herbicide ratio relative to crop acreage
+# flat_df["fungicide_ratio"] = (
+# 		flat_df[fungicide_cols].sum(axis=1) / flat_df["crop_acreage"]
+# )
+#
+# # Step 3: Performance Ratios
+# # Calculate the ratio of herbicide use relative to yield
+# flat_df["herbicide_ratio_over_yield"] = flat_df["herbicide_ratio"] / flat_df["farm_yield"]
+# flat_df["insecticide_ratio_over_yield"] = flat_df["insecticide_ratio"] / flat_df["farm_yield"]
+# flat_df["fungicide_ratio_over_yield"] = flat_df["fungicide_ratio"] / flat_df["farm_yield"]
+#
+# phyto_cols = ["herbicide_ratio_over_yield","insecticide_ratio_over_yield","fungicide_ratio_over_yield"]
+# flat_df["phyto_ratio_over_yield"] = (
+# 		flat_df[phyto_cols].sum(axis=1)
+# )
+#
+# # ======= Ferti AGGREGATION and Normaliztion to acrage==============================
+# # Define columns representing essential elements for crop nutrition
+# keywords = ['nitrogen_ha', 'phosphorus_ha', 'potassium_ha']
+# new_cols = ['Nha_ratio','Pha_ratio','Kha_ratio']
+# for k,c in zip(keywords,new_cols):
+# 	x_cols = [elem for elem in flat_df.columns if k in elem]
+# 	flat_df[c] = flat_df[x_cols].sum(axis=1)/ flat_df["farm_yield"]
+#
+#
+# # Calculate total elements ratio over yield
+# flat_df["ferti_ratio_over_yield"] = flat_df[new_cols].sum(axis=1)
+#
+# # Calculate hours of machinery use per hectare relative to yield
+# flat_df["hours_of_machines_ha_over_yield"] = (
+# 		flat_df["hours_of_machines_ha"] / flat_df["farm_yield"]
+# )
+#
 
 # ======= INU FEATURES ==============================
 # Step 4: Filter Relevant Columns
@@ -98,9 +98,9 @@ flat_df["hours_of_machines_ha_over_yield"] = (
 
 
 input_l = [
-	'phyto_ratio_over_yield',
-	'ferti_ratio_over_yield',
-	'hours_of_machines_ha_over_yield'
+	'phyto_inefficiency',
+	 'ferti_inefficiency',
+	'hours_of_machines_inefficiency'
 ]
 
 # input_l = [
@@ -207,12 +207,10 @@ flat_df = flat_df.merge(clustered_df['cluster'], on=['farm code'], how='left')
 
 
 cols_to_plot = [
-	'PLV_2_Qt','farm_yield',
+	'PLV_2_Qt','crop_yield',
 	'crop_acreage', 'hours_of_machines_ha',
 	'fert_costs_2_Qt', 'phyto_costs_2_Qt',
-	'phyto_ratio_over_yield',
-	'ferti_ratio_over_yield',
-	'hours_of_machines_ha_over_yield'
+	'N_ha', 'P_ha', 'K_ha'
 ]
 
 cols_to_plot = input_l
