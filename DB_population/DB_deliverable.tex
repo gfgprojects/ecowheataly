@@ -96,7 +96,7 @@ It can be used for statistical analysis, sustainability modelling, or visualizat
 
 For basic staticts overview and machine learning analysis, the best way to organzie the data are a regular matrix with earch row uniquely identifiy a single farm and year.
 To this end, relevant data from the JSON are extracted and reorganized into a flexible array.
-The extraction process involves several steps. First, general agricultural and economic variables are collected: produced quantity, PLV, crop acreage, hours of machinery use, and different cost components. Then, fertilizer-related information is extracted and structured both at the aggregate level and broken down by type (Mineral, OrganoMineral, Other, Micro-Mineral). Each type contains specific details such as distribution area, nutrient content, and costs.
+The extraction process involves several steps. First, general agricultural and economic variables are collected: produced quantity, PLV (acronym for the Italian Produzione Lorda vendibile: seleable gross production), crop acreage, hours of machinery use, and different cost components. Then, fertilizer-related information is extracted and structured both at the aggregate level and broken down by type (Mineral, OrganoMineral, Other, Micro-Mineral). Each type contains specific details such as distribution area, nutrient content, and costs.
 
 Phytosanitary products are extracted by category (Herbicide, Insecticide, Fungicide) and classified by toxicity levels (0–4). These quantities are aggregated per hectare and stored in structured arrays, later converted into a unified 2D dataset.
 
@@ -104,33 +104,36 @@ Phytosanitary products are extracted by category (Herbicide, Insecticide, Fungic
 
 All collected data are merged by farm and year into a single DataFrame. Missing values in phytosanitary products are interpreted as non-use and replaced with zeros. Other NaNs are flagged and addressed through filtering. Outliers such as infinite values (e.g., from division by zero) are also removed to ensure numerical consistency. Basic statistics per year are printed to assess coverage and integrity.
 
-To further refine the dataset and mitigate the impact of extreme values, a robust outlier detection procedure was applied to a selected set of continuous numeric variables using an adjusted boxplot method. This approach extends the classic Tukey rule by incorporating an asymmetry correction based on the \textit{simplified medcouple}, a robust estimator of skewness. This allows for more reliable outlier identification in variables that exhibit significant skew.
+To further refine the dataset and mitigate the impact of extreme values, a robust outlier detection procedure was applied to a selected set of continuous numeric variables using an adjusted boxplot method. This approach extends the classic Tukey rule by incorporating an asymmetry correction based on the \textit{simplified medcouple}, a robust estimator of skewness. This allows for more reliable outlier identification in variables that exhibit significant skewness.
 
 The variables subjected to this cleaning step are:
 
 \begin{itemize}
     \item \texttt{produced\_quantity}
-    \item \texttt{PLV} (Production value)
+    \item \texttt{PLV} (saleable gross production value)
     \item \texttt{fert\_costs}
     \item \texttt{phyto\_costs}
     \item \texttt{human\_costs}
-    \item \texttt{thirdy\_costs}
+    \item \texttt{thirdy\_costs} ??
     \item \texttt{machinery\_costs}
     \item \texttt{Mineral\_nitrogen\_ha}
 \end{itemize}
 
 For each of these columns, extreme values are flagged as outliers based on their deviation from adjusted Turky fences, which are scaled asymmetrically depending on the estimated skewness of the distribution.
-If the data are approximately symmetric (i.e., skewness below a threshold of 0.2), the standard Tukey fences are applied. Otherwise, the method adapts the adjusted boxplot method for outliers detection throught the Medouple skewness estimation.
+If the data are approximately symmetric (i.e., skewness below a threshold of 0.2), the standard Tukey fences are applied. Otherwise, the method adapts the adjusted boxplot method for outliers detection throught the MedCouple skewness estimation.
 The MedCouple is a robust statistical measure used to assess the skewness, or asymmetry, of a univariate distribution. Unlike classical skewness, which is based on the third central moment and highly sensitive to outliers, the MedCouple is designed to be resistant to the influence of extreme values. It operates by analyzing the symmetry of data around the median, rather than the mean, making it particularly suitable for distributions that are not normally distributed or that contain heavy tails. The MedCouple returns a value typically between –1 and 1, where values close to zero indicate symmetry, positive values indicate right-skewed distributions (with longer tails on the right), and negative values indicate left-skewed distributions. One of its most common applications is in the adjusted boxplot method for outlier detection, where it helps to adapt the Tukey fences according to the direction and intensity of the skewness. In such cases, the MedCouple extends the upper or lower boundary of the boxplot depending on the shape of the distribution, allowing for a more accurate identification of true outliers in asymmetric data. Due to its robustness and simplicity, the MedCouple is widely used in exploratory data analysis, especially when dealing with real-world datasets that may deviate from ideal statistical assumptions.
 
 All flagged outliers are put in the dataset as Not-a-Number (NaN) to ensure statistical robustness and improve the stability of downstream modeling tasks.
-A summary about the numebr of detected outliers is presented in the following table.
+A summary about the number of detected outliers is presented in the following table.
 
 \input{tabella_output.tex}
+
+??explanation of columns headings is needed??
+
 
 The result is a flattened, cleaned panel dataset saved as \texttt{flat\_df.csv}, which serves as the input for machine learning and clustering tasks.
 
 \section*{Authors}
-Arianna Di Poola \\ Gianfranco Giulioni
+Arianna Di Paola \\ Gianfranco Giulioni
 
 \end{document}
