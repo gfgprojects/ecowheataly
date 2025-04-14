@@ -80,51 +80,19 @@ def main(year: int = 2016):
             f"Emtpy DataFram with year {year}. Please, select another value."
             )
 
-    # Step 2: Basic Feature Engineering
-    # Identify all columns related to herbicides
-    herbicide_cols = [elem for elem in flat_df.columns if "Herbicide_Qt" in elem]
-
-    # Calculate farm yield as produced quantity per crop acreage
-    flat_df = flat_df.assign(
-        farm_yield = lambda x: x.produced_quantity / x.crop_acreage
-    )
-
-    # Compute the herbicide ratio relative to crop acreage
-    flat_df["herbicide_ratio"] = (
-        flat_df[herbicide_cols].sum(axis=1) / flat_df["crop_acreage"]
-    )
-
-    # Step 3: Performance Ratios
-    # Calculate the ratio of herbicide use relative to yield
-    flat_df["herbicide_ratio_over_yield"] = flat_df["herbicide_ratio"] / flat_df["farm_yield"]
-
-    # Define columns representing essential elements for crop nutrition
-    elements_cols = ['nitrogen_ha', 'phosphorus_ha', 'potassium_ha']
-    # Calculate total elements ratio over yield
-    flat_df["fertilizers_ratio_over_yield"] = (
-        flat_df[elements_cols].sum(axis=1) / flat_df["farm_yield"]
-    )
-
-    # Calculate hours of machinery use per hectare relative to yield
-    flat_df["hours_of_machines_ha_over_yield"] = (
-        flat_df["hours_of_machines_ha"] / flat_df["farm_yield"]
-    )
-
-    # Step 4: Filter Relevant Columns
+    # Filter Relevant Columns
     input_l = [
-        # List of clustering input features (some columns are commented out but kept for reference)
-        'herbicide_ratio_over_yield', 
-<<<<<<< Updated upstream:clustering_AC/03_new_features_and_clustering.py
-        'elements_ratio_over_yield',
-=======
-        'fertilizers_ratio_over_yield',
->>>>>>> Stashed changes:clustering_pipeline/03_new_features_and_clustering.py
-        'hours_of_machines_ha_over_yield'
+        'phyto_inefficiency',
+         'ferti_inefficiency',
+        'hours_of_machines_inefficiency'
     ]
 
-    # Step 5: Handle Infinite Values
+    # Handle Infinite Values
     # Remove rows containing infinite values in the specified input columns
-    flat_df = flat_df[~np.isinf(flat_df.filter(input_l)).any(axis=1)]
+    flat_df = (
+        flat_df[~np.isinf(flat_df.filter(input_l)).any(axis=1)]
+        .dropna(subset=input_l, how="any")
+        )
     infinite_rows = flat_df[np.isinf(flat_df.filter(input_l)).any(axis=1)]
 
     # Save any remaining rows with infinite values to an Excel file for further inspection
@@ -144,7 +112,7 @@ def main(year: int = 2016):
         _, _, silhouette_score, inertia = clustering.analyze_clusters(
             df=flat_df.filter(input_l),
             remove_outliers=True,
-            y_col_to_plot="herbicide_ratio_over_yield",
+            y_col_to_plot="phyto_inefficiency",
             k=k,
             plot_clusters=False
         )
@@ -179,8 +147,8 @@ def main(year: int = 2016):
     # Step 8: Final Clustering with Optimal k
     clustered_df, unique_labels, silhouette_score, inertia = clustering.analyze_clusters(
         df=flat_df.filter(input_l + ["farm code"]),
-        remove_outliers=True,
-        y_col_to_plot="herbicide_ratio_over_yield",
+        remove_outliers=False,
+        y_col_to_plot="phyto_inefficiency",
         k=optimal_k,
         plot_clusters=False,
         index_col="farm code"
@@ -200,43 +168,29 @@ def main(year: int = 2016):
         json.dump(stats_dict, json_file, indent=4)
 
     # Assign cluster labels to the main DataFrame
-    flat_df["cluster"] = clustered_df["cluster"]
+    flat_df["cluster"] = clustered_df["cluster"].tolist()
 
     # Step 9: Cluster Visualization
-<<<<<<< Updated upstream:clustering_AC/03_new_features_and_clustering.py
-    # cols_to_plot = [
-    #    'farm_acreage', 
-    #    'produced_quantity',
-    #    'crop_acreage', 
-    #    'hours_of_machines_ha', 
-    #    'nitrogen_ha', 
-    #    'herbicide_ratio',
-    #    'herbicide_ratio_over_yield', 
-    #    'elements_ratio_over_yield',
-    #    'hours_of_machines_ha_over_yield'
-    # ]
-    
     cols_to_plot = input_l
-=======
-    cols_to_plot = [
-       'farm_acreage', 'produced_quantity',
-       'crop_acreage', 'hours_of_machines_ha', 
-       'nitrogen_ha', 'herbicide_ratio',
-       'herbicide_ratio_over_yield', 
-       'fertilizers_ratio_over_yield',
-       'hours_of_machines_ha_over_yield'
-    ]
->>>>>>> Stashed changes:clustering_pipeline/03_new_features_and_clustering.py
-    
+
+    cols_to_plot =  [
+        'PLV_2_Qt','crop_yield',
+        'crop_acreage', 'hours_of_machines_ha',
+        'fert_costs_2_Qt', 'phyto_costs_2_Qt',
+        'N_ha', 'P_ha', 'K_ha'
+    ] + input_l
+        
     # Visualize each cluster against specified columns
     for y_col_to_plot in cols_to_plot:
+        
         clustering.visualize_clusters(
             df=flat_df, 
             x='cluster', 
             y=y_col_to_plot, 
-            export_locally=True
+            export_locally=True,
+            sort_by=y_col_to_plot
         )
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

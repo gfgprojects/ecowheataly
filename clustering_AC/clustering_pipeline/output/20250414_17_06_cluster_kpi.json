@@ -1,0 +1,137 @@
+{
+    "0": {
+        "size": 245,
+        "phyto_inefficiency": {
+            "mean": 0.0010614019306016637,
+            "std": 0.0014297857231535878
+        },
+        "ferti_inefficiency": {
+            "mean": 1.0059164731125796,
+            "std": 0.8052373898392031
+        },
+        "hours_of_machines_inefficiency": {
+            "mean": 0.5285726604115659,
+            "std": 0.10187574392015705
+        }
+    },
+    "1": {
+        "size": 372,
+        "phyto_inefficiency": {
+            "mean": 0.0014981207954628754,
+            "std": 0.0013962350339991633
+        },
+        "ferti_inefficiency": {
+            "mean": 2.577360712816565,
+            "std": 0.590472758695476
+        },
+        "hours_of_machines_inefficiency": {
+            "mean": 0.2304767351830983,
+            "std": 0.10822555086463272
+        }
+    },
+    "2": {
+        "size": 51,
+        "phyto_inefficiency": {
+            "mean": 0.015103112538860328,
+            "std": 0.0031002499625296396
+        },
+        "ferti_inefficiency": {
+            "mean": 2.722616981792096,
+            "std": 1.0426613067312305
+        },
+        "hours_of_machines_inefficiency": {
+            "mean": 0.4560503234433632,
+            "std": 0.19579794531804054
+        }
+    },
+    "3": {
+        "size": 172,
+        "phyto_inefficiency": {
+            "mean": 0.001637637410393798,
+            "std": 0.0017772783130918372
+        },
+        "ferti_inefficiency": {
+            "mean": 4.753207434377471,
+            "std": 0.7635112684849559
+        },
+        "hours_of_machines_inefficiency": {
+            "mean": 0.29176540061246964,
+            "std": 0.11930923738215665
+        }
+    },
+    "4": {
+        "size": 308,
+        "phyto_inefficiency": {
+            "mean": 0.0009515037583929787,
+            "std": 0.0012376005371618106
+        },
+        "ferti_inefficiency": {
+            "mean": 0.6164246608470194,
+            "std": 0.5388998010756554
+        },
+        "hours_of_machines_inefficiency": {
+            "mean": 0.19801369050095569,
+            "std": 0.09302877488533151
+        }
+    },
+    "5": {
+        "size": 124,
+        "phyto_inefficiency": {
+            "mean": 0.006981411032687972,
+            "std": 0.0018385176730845048
+        },
+        "ferti_inefficiency": {
+            "mean": 3.1253033730344986,
+            "std": 0.8412716923906985
+        },
+        "hours_of_machines_inefficiency": {
+            "mean": 0.44294672028654836,
+            "std": 0.16313989527729125
+        }
+    },
+    "6": {
+        "size": 147,
+        "phyto_inefficiency": {
+            "mean": 0.0017135793047108475,
+            "std": 0.0017680257701302696
+        },
+        "ferti_inefficiency": {
+            "mean": 3.74445926861262,
+            "std": 0.9017954467234489
+        },
+        "hours_of_machines_inefficiency": {
+            "mean": 0.7167022925804432,
+            "std": 0.15897292823340045
+        }
+    },
+    "7": {
+        "size": 89,
+        "phyto_inefficiency": {
+            "mean": 0.0006220584540957592,
+            "std": 0.0015393118957298896
+        },
+        "ferti_inefficiency": {
+            "mean": 0.7413271052290694,
+            "std": 0.9795043408662867
+        },
+        "hours_of_machines_inefficiency": {
+            "mean": 0.9951098370347894,
+            "std": 0.15542839300268743
+        }
+    },
+    "8": {
+        "size": 101,
+        "phyto_inefficiency": {
+            "mean": 0.008257791879228394,
+            "std": 0.002152202113601423
+        },
+        "ferti_inefficiency": {
+            "mean": 1.2259541606471231,
+            "std": 0.6971656934773288
+        },
+        "hours_of_machines_inefficiency": {
+            "mean": 0.231011532985321,
+            "std": 0.13108533979891868
+        }
+    }
+}
