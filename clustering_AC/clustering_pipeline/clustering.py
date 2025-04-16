@@ -116,7 +116,7 @@ def visualize_clusters(df: pd.DataFrame, x: str, y: str, export_locally: bool = 
 	"""
  
 	# Create output directory if it doesn't exist and export_locally is True
-	base_export_path = "clustering_AC/clustering_pipeline/output"
+	base_export_path = "clustering_AC/output"
 	if export_locally and (not os.path.exists(base_export_path)):
 		os.makedirs(base_export_path)
 

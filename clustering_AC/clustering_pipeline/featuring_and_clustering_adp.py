@@ -189,6 +189,8 @@ clustered_df, unique_labels, silhouette_score, inertia = analyze_clusters(
 
 # Generate statistics for each cluster
 stats_dict = get_cluster_stats(clustered_df)
+#ORDERING: # Ordinamento delle chiavi in base al mean di 'ferti_inefficiency'
+sorted_keys = sorted(stats_dict.keys(), key=lambda k:stats_dict[k]['phyto_inefficiency']['mean'])
 
 # # Export Json
 # # Save the dictionary as a JSON file in the output folder
@@ -206,6 +208,7 @@ stats_dict = get_cluster_stats(clustered_df)
 flat_df = flat_df.merge(clustered_df['cluster'], on=['farm code'], how='left')
 
 
+print(sorted_keys)
 cols_to_plot = [
 	'PLV_2_Qt','crop_yield',
 	'crop_acreage', 'hours_of_machines_ha',

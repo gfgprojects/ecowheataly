@@ -33,7 +33,7 @@ phy_vars = ['phyto_area','distribuited_quantity_ha','unit_cost','distribuited_va
 
 
 years = np.arange(2008,2023)
-species = 'durum_wheat'
+species = 'common_wheat'
 
 farms = []
 for key, val in data.items():
@@ -76,9 +76,9 @@ Vars_name = ['year', 'farm code','species','farm_acreage'] + wheat_vars
 years = np.arange(2008,2023)
 for year in years:
     if year == years[0]:
-        Mat = extract_data(data, str(year), farms, wheat_vars)
+        Mat = extract_data(data, str(year), farms, wheat_vars,species=species)
     else:
-        mat = extract_data(data, str(year), farms, wheat_vars)
+        mat = extract_data(data, str(year), farms, wheat_vars,species=species)
         Mat.extend(mat)
 
 
@@ -313,9 +313,13 @@ plt.tight_layout()
 
 # NB phyto_inefficiency' and ferti_inefficiency fa da cappello per tutte le colonne sui fito e fertilizzanti!
 sel_cols=['produced_quantity', 'PLV',
-        'fert_costs', 'phyto_costs',
-       'thirdy_costs', 'human_costs', 'machinery_costs', 'Mineral_nitrogen_ha',
-          'crop_yield',  'phyto_inefficiency', 'ferti_inefficiency',
+          'fert_costs', 'phyto_costs',
+          'thirdy_costs', 'human_costs',
+          'machinery_costs',
+          'Mineral_nitrogen_ha',
+          'crop_yield',
+          'phyto_inefficiency',
+          'ferti_inefficiency',
           'hours_of_machines_inefficiency']
 
 log1_records = []
