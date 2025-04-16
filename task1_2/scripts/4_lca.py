@@ -5,16 +5,25 @@ import bw2data as bd
 import bw2calc as bc
 import numpy as np
 import pandas as pd
-from  task1_2.scripts.utils import get_pesticide_info
+from  task1_2.scripts.utils import get_pesticide_info, parse_pesticide_variable
 
+# ========================================================================
+flat_df= pd.read_csv('task1_2/scripts/flat_df.csv')
+cluster = 2
+hours_of_tractor_use = flat_df.loc[flat_df["cluster"] == cluster, "hours_of_machines_ha"].mean()
 
-# Step 1: Provide inputs for 1 hectare
-hours_of_tractor_use = 2.5
+# input 1: Provide hours of machine for 1 hectare
+# hours_of_tractor_use = 2.5
 MJ = 100 / 0.2779 * hours_of_tractor_use  # Tractor energy calculation
 
-kg_of_nitrogen = 50
+# ========================================================================
+# input 2: fertilizers
+# kg_of_nitrogen = 50
+Ql2Kg = 100
+kg_of_nitrogen = flat_df.loc[flat_df["cluster"] == cluster, "N_ha"].mean() * Ql2Kg
 
-# Step 1: Definizione delle variabili in un dizionario
+# ========================================================================
+# Input 3: Phytopharms : PRE-ALLOCATION into a dictionary
 fito_biosphere_exchanges = {
     "Fungicide_harmful": 0,
     "Herbicide_caution": 0,
@@ -26,25 +35,46 @@ fito_biosphere_exchanges = {
     "Molluscicide_irritating": 0
 }
 
-# Step 2: DAL DATO RICA (qui solo un esempio) estraggo le info associate a FITOGESG+
-fito_info = get_pesticide_info("Anticrittogamico", 4)
+# from rica to FITOGESG+ nomenclature
+for flat_col in np.arange(43,58):
+    col_name = flat_df.columns[flat_col]
+    mean_val = flat_df.loc[flat_df["cluster"] == cluster, col_name].mean()
+    type, num = parse_pesticide_variable(col_name)
+    fito_info = get_pesticide_info(type, num)
 
-chem_type = fito_info[0]['type'].capitalize()  # Prima lettera maiuscola
-tox_level = fito_info[0]['tox_level'].lower()  # Minuscolo
-key = f"{chem_type}_{tox_level}"  # Creazione della chiave (es. "Fungicide_irritating")
+    if fito_info =='Nessuna corrispondenza trovata per i criteri dati.':
+        pass
+    else:
+        # fito_info = get_pesticide_info("Anticrittogamico", 4,mode='RICA')
+        chem_type = fito_info[0]['type'].capitalize()  # Prima lettera maiuscola
+        tox_level = fito_info[0]['tox_level'].lower()  # Minuscolo
+        key = f"{chem_type}_{tox_level}"  # Creazione della chiave (es. "Fungicide_irritating")
 
-# Step 4: if the key correspond to a biosdphere exchanges:
-if key in fito_biosphere_exchanges:
-    value = float(fito_info[0]['active_ing_per_ha'].split()[0])
-    fito_biosphere_exchanges[key] = fito_info[0]['active_ing_per_ha']
+        # last step: if the key correspond to a biosdphere exchanges:
+        # DICT UPDATING
+        if key in fito_biosphere_exchanges:
+            raw_value = fito_info[0]['active_ing_per_ha'].split()[0]
+            try:
+                value = float(raw_value)
+            except ValueError:
+                # caso intervallo "360-4320"
+                if "-" in raw_value:
+                    parts = raw_value.split("-")
+                    nums = [float(p) for p in parts]
+                    value = sum(nums) / len(nums)  # media
+                else:
+                    raise ValueError(f"Formato non gestito: {raw_value}")
+            # value = float(fito_info[0]['active_ing_per_ha'].split()[0])
+            fito_biosphere_exchanges[key] = value#fito_info[0]['active_ing_per_ha']
 
 
 
-# Step 2: Create the EcoWheataly production activity (Invetory phase)
+# ================================ HERE WE SET THE INPUTS AMOUNT =============================
+# Step 1: Create the EcoWheataly production activity (Invetory phase)
 db_name = "ecowheataly"
 ecowheatalydb = bd.Database(db_name)
 
-# Remove any existing activity with the same code to avoid conflicts
+# step 2 Remove any existing activity with the same code to avoid conflicts
 for act in ecowheatalydb:
     if act['code'] == 'EcoWheataly production':
         act.delete()
@@ -52,7 +82,8 @@ for act in ecowheatalydb:
 
 wheat_prod = ecowheatalydb.new_activity(code='EcoWheataly production', name='EcoWheataly production', unit='hectare')
 
-# Add uses of machine
+
+# step 3: specify the inputs ampunt into each exchanges
 wheat_prod.new_exchange(input=('usda_item', 'work; ag. tractors for growing win wheat, 2014 fleet, all fuels; 100-175HP'),
                         amount=MJ, unit="megajoule", type='technosphere').save()
 
@@ -77,7 +108,7 @@ for code, amount in fito_fluxes_code:
     wheat_prod.new_exchange(input=('biosphere3', code), amount=amount, unit="kilogram", type='biosphere').save()
 wheat_prod.save()
 
-# ------------ USING OBSERVATION TO PERFORM LCA:
+# ================   PERFORM LCA:
 # Step 3: Perform LCA
 functional_unit = {wheat_prod: 1}
 recipe = [m for m in bd.methods if 'ReCiPe 2016' in str(m) and '20180117' in str(m)]
