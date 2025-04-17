@@ -5,7 +5,7 @@ import bw2data as bd
 import bw2calc as bc
 import numpy as np
 import pandas as pd
-from  task1_2.scripts.utils import get_pesticide_info
+from  utils import get_pesticide_info
 
 
 # Step 1: Provide inputs for 1 hectare
