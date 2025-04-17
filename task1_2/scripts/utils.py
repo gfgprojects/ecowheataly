@@ -45,7 +45,7 @@ data = {
 df = pd.DataFrame(data)
 
 # Dizionario di mappatura dall'input italiano all'output inglese
-category_mapping = {
+category_mapping_RICA = {
     "Acaricida": "acaricide",
     "Anticrittogamico": "fungicide",
     "Insetticida": "Insecticide",
@@ -55,6 +55,14 @@ category_mapping = {
     "Diserbante": "herbicide",
     "Fitoregolatore": "growth regulator"
 }
+
+category_mapping = {
+
+    "Fungicide": "fungicide",
+    "Insecticide": "Insecticide",
+    "Herbicide": "herbicide",
+}
+
 
 # Mappatura delle classi di tossicità
 toxicity_mapping = {
@@ -66,9 +74,13 @@ toxicity_mapping = {
 }
 
 # Funzione per ottenere la corrispondenza
-def get_pesticide_info(category, toxicity):
-    fitogest_cat = category_mapping.get(category)
-    fitogest_tox = toxicity_mapping.get(toxicity)
+def get_pesticide_info(category, toxicity,mode='flat'):
+    if mode=='rica':
+        fitogest_cat = category_mapping_RICA.get(category)
+        fitogest_tox = toxicity_mapping_RICA.get(toxicity)
+    else:
+        fitogest_cat = category_mapping.get(category)
+        fitogest_tox = toxicity_mapping.get(toxicity)
 
     if not fitogest_cat or not fitogest_tox:
         return "Errore: Categoria o livello di tossicità non valido"
@@ -85,3 +97,15 @@ def get_pesticide_info(category, toxicity):
 
 # Test della funzione con l'input specificato
 test_result = get_pesticide_info("Anticrittogamico", 4)
+
+import re
+def parse_pesticide_variable(var_name):
+    match = re.match(r"(Herbicide|Insecticide|Fungicide)_Qt Tox-(\d)", var_name)
+    if match:
+        pesticide_type = match.group(1)
+        number = int(match.group(2))
+        return pesticide_type, number
+    else:
+        raise ValueError(f"Formato non riconosciuto: {var_name}")
+
+    # Esempio di utilizzo
