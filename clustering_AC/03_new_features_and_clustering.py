@@ -13,8 +13,8 @@ from tqdm import tqdm
 from datetime import datetime
 import matplotlib.pyplot as plt
 
-from clustering_pipeline import clustering
-
+# from clustering_pipeline import clustering
+from clustering_AC.clustering_pipeline import clustering
 
 def _get_cluster_stats(clustered_df: pd.DataFrame):
     
@@ -64,12 +64,12 @@ def _compute_optimal_k(result_df: pd.DataFrame):
 def main(year: int = 2016):
     
     # Create the "output" folder if it doesn't exist
-    output_folder_path = 'clustering_pipeline/output'
+    output_folder_path = 'clustering_AC/clustering_pipeline/output'
     if not os.path.exists(output_folder_path):
         os.makedirs(output_folder_path)
     
     # Step 1: Load data
-    flat_df = pd.read_csv("clustering_pipeline/data/flat_df.csv")  # Load data into a DataFrame
+    flat_df = pd.read_csv("clustering_AC/clustering_pipeline/data/flat_df.csv")  # Load data into a DataFrame
     
     # Filter data for the selected year
     print(f"Filtering year for selected value: {year}")
@@ -161,7 +161,8 @@ def main(year: int = 2016):
     # Save the dictionary as a JSON file in the output folder
     export_path = os.path.join(
         output_folder_path, 
-        f"{datetime.now().strftime('%Y%m%d_%H_%M')}_cluster_kpi.json"
+        # f"{datetime.now().strftime('%Y%m%d_%H_%M')}_cluster_kpi.json"
+        "cluster_kpi.json"
         )
     
     with open(export_path, 'w') as json_file:
@@ -190,7 +191,8 @@ def main(year: int = 2016):
             export_locally=True,
             sort_by=y_col_to_plot
         )
-
+    # export flat_df with clusters in LCA folder
+    flat_df.to_csv("task1_2/scripts/flat_df.csv", index=False)
 
 # if __name__ == "__main__":
 #     main()

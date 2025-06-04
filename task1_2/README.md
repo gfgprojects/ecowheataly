@@ -20,6 +20,10 @@ Folder Task1_2/scripts holds the Python scripts to perform the activities of Tas
 The setup needed to perform ECOWHEATALY LCA is as follows:
 
 - Install Brightway;
+	``` 
+    pip install brightway25 pypardiso
+    ```
+
 - install the `bw-recipe-2016` package
 
 	```

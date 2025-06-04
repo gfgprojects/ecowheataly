@@ -30,7 +30,7 @@ This makes it possible to use Brightway impact assessment methods
 
 import bw2data as bd
 import bw2io.importers.json_ld as bij
-
+import os
 
 print('===========================================================')
 print('===========================================================')
@@ -41,7 +41,8 @@ print('===========================================================')
 new_db_name='usda_item'
 if new_db_name in bd.databases:
     del bd.databases[new_db_name]
-folder_name='usda_tractors'
+folder_name = "task1_2.scripts.usda_tractors"
+
 imported=bij.JSONLDImporter(folder_name,new_db_name)
 
 bs3=bd.Database('biosphere3')
