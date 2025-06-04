@@ -97,36 +97,73 @@ for met,c in zip(selected_methods,conversion_factors):
 
 
 # ------------------------ copy other relevant methods
+def safe_copy_method(source_key, destination_key, label=""):
+	try:
+		if destination_key in bd.methods:
+			print(f"[SKIP] {label or destination_key} già presente.")
+        else:
+            bd.Method(source_key).copy(destination_key)
+            print(f"[OK] Copiato {label or destination_key}")
+    except Exception as e:
+        print(f"[ERRORE] Durante la copia di {label or destination_key}: {e}")
 
-#bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming', '1000 year timescale', 'Egalitarian')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming 1000 year timescale', 'Humans and Ecosystems','Global','ecowheataly'))
-print('Copying global warming 100years Midpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming', '100 year timescale', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming 100 year timescale', 'Humans and Ecoystems','Global','ecowheataly'))
-#bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming', '20 year timescale', 'Individualist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming 20 year timescale', 'Humans and Ecosystems','Global','ecowheataly'))
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming', '100 year timescale', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Global Warming 100 year timescale', 'Humans and Ecoystems','Global','ecowheataly'),
+    "Midpoint Global Warming 100a"
+)
 
-print('Copying Toxicity Humans carcinogenic Midpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Carcinogenic', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Humans - Carcinogenic','Global','ecowheataly'))
-print('Copying Toxicity Humans non-carcinogenic Midpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Non-carcinogenic', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Humans - Non-carcinogenic','Global','ecowheataly'))
-print('Copying Toxicity Terrestrial Midpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Ecotoxicity', 'Terrestrial', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Ecosystems - Terrestrial','Global','ecowheataly'))
-print('Copying Toxicity Freshwater Midpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Ecotoxicity', 'Freshwater', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Ecosystems - Freshwater','Global','ecowheataly'))
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Carcinogenic', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Humans - Carcinogenic','Global','ecowheataly'),
+    "Midpoint Toxicity Humans - Carcinogenic"
+)
 
-#bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Ecotoxicity', 'Marine', 'Hierarchist').copy(('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Ecoxicity - Marine', 'Damage to Ecosystems','Global','ecowheataly'))
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Non-carcinogenic', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Humans - Non-carcinogenic','Global','ecowheataly'),
+    "Midpoint Toxicity Humans - Non-carcinogenic"
+)
 
-print('Copying global warming 100years Endpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Human health', 'Global Warming', '100 year timescale', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Global Warming 100 year timescale', 'Humans and Ecoystems','Global','ecowheataly'))
-print('Copying Toxicity Humans carcinogenic Endpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Human health', 'Toxicity', 'Carcinogenic', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Toxicity', 'Humans - Carcinogenic','Global','ecowheataly'))
-print('Copying Toxicity Humans non-carcinogenic Endpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Human health', 'Toxicity', 'Non-carcinogenic', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Toxicity', 'Humans - Non-carcinogenic','Global','ecowheataly'))
-print('Copying Toxicity Terrestrial Endpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Terrestrial ecosystems', 'Ecotoxicity', 'Terrestrial', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Toxicity', 'Ecosystems - Terrestrial','Global','ecowheataly'))
-print('Copying Toxicity Freshwater Endpoint')
-bd.Method(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Freshwater ecosystems', 'Ecotoxicity', 'Freshwater', 'Hierarchist')).copy(('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Toxicity', 'Ecosystems - Freshwater','Global','ecowheataly'))
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Ecotoxicity', 'Terrestrial', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Ecosystems - Terrestrial','Global','ecowheataly'),
+    "Midpoint Toxicity Ecosystems - Terrestrial"
+)
 
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Ecotoxicity', 'Freshwater', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Midpoint', 'Toxicity', 'Ecosystems - Freshwater','Global','ecowheataly'),
+    "Midpoint Toxicity Ecosystems - Freshwater"
+)
 
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Human health', 'Global Warming', '100 year timescale', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Global Warming 100 year timescale', 'Humans and Ecoystems','Global','ecowheataly'),
+    "Endpoint Global Warming 100a"
+)
 
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Human health', 'Toxicity', 'Carcinogenic', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Toxicity', 'Humans - Carcinogenic','Global','ecowheataly'),
+    "Endpoint Toxicity Humans - Carcinogenic"
+)
 
-##
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Human health', 'Toxicity', 'Non-carcinogenic', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Toxicity', 'Humans - Non-carcinogenic','Global','ecowheataly'),
+    "Endpoint Toxicity Humans - Non-carcinogenic"
+)
+
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Terrestrial ecosystems', 'Ecotoxicity', 'Terrestrial', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Toxicity', 'Ecosystems - Terrestrial','Global','ecowheataly'),
+    "Endpoint Toxicity Ecosystems - Terrestrial"
+)
+
+safe_copy_method(
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Freshwater ecosystems', 'Ecotoxicity', 'Freshwater', 'Hierarchist'),
+    ('ReCiPe 2016', '1.1 (20180117)', 'Endpoint', 'Toxicity', 'Ecosystems - Freshwater','Global','ecowheataly'),
+    "Endpoint Toxicity Ecosystems - Freshwater"
+)
 
