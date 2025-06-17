@@ -62,7 +62,7 @@ def _compute_optimal_k(result_df: pd.DataFrame):
 
 
 def main(year: int = 2016):
-    
+
     # Create the "output" folder if it doesn't exist
     output_folder_path = 'clustering_pipeline/output'
     if not os.path.exists(output_folder_path):
@@ -106,7 +106,7 @@ def main(year: int = 2016):
 
     # Step 6: Clustering Analysis
     result_l = []  # List to store clustering results
-    for k in tqdm(range(5, 150, 1)):  # Iterate over a range of cluster sizes
+    for k in tqdm(range(2, 15, 1)):  # Iterate over a range of cluster sizes
     
         # Analyze clusters for the current number of clusters (k)
         _, _, silhouette_score, inertia = clustering.analyze_clusters(
@@ -131,7 +131,7 @@ def main(year: int = 2016):
 
     # Step 7: Visualization
     # Plot Inertia vs. Number of Clusters
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(6, 5))
     plt.plot(result_df.k, result_df.inertia, marker='o', linestyle='-', color='blue', label='Inertia')
     plt.axvline(x=optimal_k, color='red', linestyle='--', linewidth=1.5, label=f'Optimal k = {optimal_k}')
     plt.xlabel("Number of Clusters (k)", fontsize=14, weight='bold')
@@ -142,6 +142,7 @@ def main(year: int = 2016):
     plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
     plt.tight_layout()
+    plt.savefig(f"{output_folder_path}/elbow.png")
     plt.show()
 
     # Step 8: Final Clustering with Optimal k
@@ -173,13 +174,18 @@ def main(year: int = 2016):
     # Step 9: Cluster Visualization
     cols_to_plot = input_l
 
+
     cols_to_plot =  [
         'PLV_2_Qt','crop_yield',
         'crop_acreage', 'hours_of_machines_ha',
         'fert_costs_2_Qt', 'phyto_costs_2_Qt',
         'N_ha', 'P_ha', 'K_ha'
     ] + input_l
-        
+    #cols_to_plot =  ['hours_of_machines_ha','N_ha','crop_acreage']
+    cols_to_plot =  ['herbicide_inefficiency','phyto_inefficiency','ferti_inefficiency', 'hours_of_machines_inefficiency']
+
+
+
     # Visualize each cluster against specified columns
     for y_col_to_plot in cols_to_plot:
         
@@ -192,5 +198,5 @@ def main(year: int = 2016):
         )
 
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()

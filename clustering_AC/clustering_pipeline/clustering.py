@@ -169,9 +169,10 @@ def visualize_clusters(
         )
     else:
         cluster_order = sorted(df[x].unique())
-
+    #print(cluster_order)
+    cluster_order=[0, 1, 4, 2, 3]
     # Increase figure size for better readability
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(6, 5))
 
     # Remove outliers based on IQR of y to avoid extreme points overshadowing the boxplot
     Q1 = df[y].quantile(0.25)
@@ -191,7 +192,9 @@ def visualize_clusters(
         hue=x, 
         legend=False
     )
-
+    #change x axis labels to obtain increasing cluster 
+    labels=range(len(ax.get_xticklabels())+1)
+    ax.set_xticklabels(labels)
     # Count observations per cluster
     counts = df.groupby(x)[y].size().reset_index(name='counts')
     counts['percentage'] = (counts['counts'] / counts["counts"].sum()) * 100
@@ -203,6 +206,7 @@ def visualize_clusters(
             continue
         
         cluster_data = df_filtered[df_filtered[x] == cluster_name][y]
+        print(str(cluster_name),str(len(cluster_data)))
         if cluster_data.empty:
             continue
         
@@ -221,13 +225,17 @@ def visualize_clusters(
             f'n = {int(row["counts"].iloc[0])}\n({row["percentage"].iloc[0]:.1f}%)',
             ha='center',
             va='bottom',
-            fontsize='small',
-            weight='semibold'
+#            fontsize='small',
+            fontsize=12,
+#            weight='semibold'
         )
 
     sns.despine(offset=10, trim=True)
     plt.tight_layout()
-
+    plt.xlabel(x,fontsize=14)
+    plt.ylabel(y,fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
     if export_locally:
         plt.savefig(
             f"{base_export_path}/{datetime.now().strftime('%Y%m%d')}_boxplot_{y}.png",
