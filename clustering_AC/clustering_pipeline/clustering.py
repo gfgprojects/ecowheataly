@@ -154,7 +154,7 @@ def visualize_clusters(
                        Useful to see ascending/descending patterns.
     """
     # Create output directory if needed
-    base_export_path = "clustering_pipeline/output"
+    base_export_path = "'clustering_AC/clustering_pipeline/output'"
     if export_locally and not os.path.exists(base_export_path):
         os.makedirs(base_export_path)
 
@@ -190,7 +190,7 @@ def visualize_clusters(
         order=cluster_order,
         palette="Set3",
         hue=x, 
-        legend=False
+        # legend=False
     )
     #change x axis labels to obtain increasing cluster 
     labels=range(len(ax.get_xticklabels())+1)
@@ -238,7 +238,8 @@ def visualize_clusters(
     plt.yticks(fontsize=12)
     if export_locally:
         plt.savefig(
-            f"{base_export_path}/{datetime.now().strftime('%Y%m%d')}_boxplot_{y}.png",
+            # f"{base_export_path}/{datetime.now().strftime('%Y%m%d')}_boxplot_{y}.png",
+            f"{base_export_path}/boxplot_{y}.png",
             format='png'
         )
 
