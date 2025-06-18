@@ -1,0 +1,139 @@
+%! Author = Arianna Di Poola & Gianfranco Giulioni
+%! Date = \today
+
+\documentclass[11pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{booktabs}
+\geometry{margin=2.5cm}
+
+
+% Document
+\begin{document}
+
+\title{ECOWHEATALY Database Generation Report}
+\author{Arianna Di Poola \\ Gianfranco Giulioni}
+\date{\today}
+\maketitle
+
+\section*{Objective}
+The script builds the \textbf{ECOWHEATALY} database, a structured JSON file containing detailed farm-level information on wheat production in Italy, based on data from the RICA (Italian FADN) dataset. The goal is to consolidate information about crop production, fertilization, pesticide usage, machinery and labor use, and economic indicators for durum and common wheat producers.
+
+\section*{Input Data}
+The script loads multiple CSV files from the \texttt{Stats/RICA\_DATA} directory:
+
+\begin{itemize}
+    \item \texttt{aziende\_grano.csv}: General farm-level characteristics
+    \item \texttt{colture\_grano.csv}: Crop production and costs
+    \item \texttt{fertilizzanti\_grano.csv}: Fertilizer usage
+    \item \texttt{fitofarmaci\_grano.csv}: Pesticide usage
+    \item \texttt{bilancio\_grano.csv}: Economic balances
+    \item \texttt{certificazioni\_grano.csv}: Certifications
+\end{itemize}
+
+\section*{Processing Steps}
+\begin{enumerate}
+    \item \textbf{Province Name Standardization:} Harmonizes province names for consistency.
+    \item \textbf{Outlier Removal:} (Optional, not implemented here) Uses adjusted boxplot filtering to clean input variables.
+    \item \textbf{Farm Metadata:} For each farm, general info is stored (region, province, orientation, gender, youth).
+    \item \textbf{Yearly Farm Data:} Includes:
+    \begin{itemize}
+        \item Standard output, farm acreage (SAU), machine power
+    \end{itemize}
+    \item \textbf{Wheat Crop Data:} For durum and common wheat:
+    \begin{itemize}
+        \item Quantity, acreage, wheat price, hours of machine use per hectare
+        \item Labor, machinery, fertilizer and pesticide costs
+    \end{itemize}
+    \item \textbf{Fertilizer Classification:} Types grouped (e.g., mineral, organo-mineral) with NPK content.
+    \item \textbf{Pesticide Classification:} Categorized by type and toxicity; only selected classes retained.
+\end{enumerate}
+
+\section*{Database Structure}
+The final JSON \texttt{ecowheataly\_database.json} is a nested dictionary with the structure:
+
+
+\begin{verbatim}
+
+  "farm_id": {
+    "region": "...",
+    "province": "...",
+    "technical-economic_orientation": "...",
+    "years": {
+      "2016": {
+        "farm_acreage": ...,
+        "standard_gross_output": ...,
+        "durum_wheat": {
+          "produced_quantity": ...,
+          "fertilizers": {
+            "Mineral": {
+              "nitrogen_ha": ...,
+              ...
+            }
+          },
+          "phytosanitary": {
+            "Herbicide": {
+              3: { "distributed_quantity_ha": ..., ... }
+
+\end{verbatim}
+
+\section*{Output}
+The JSON file is saved to:
+\begin{verbatim}
+Stats/ecowheataly_database.json
+\end{verbatim}
+It can be used for statistical analysis, sustainability modelling, or visualization.
+
+
+\section{Flatten Database for Machine Learning and basic Statistic overview}
+
+For basic staticts overview and machine learning analysis, the best way to organzie the data are a regular matrix with earch row uniquely identifiy a single farm and year.
+To this end, relevant data from the JSON are extracted and reorganized into a flexible array.
+The extraction process involves several steps. First, general agricultural and economic variables are collected: produced quantity, PLV (acronym for the Italian Produzione Lorda vendibile: seleable gross production), crop acreage, hours of machinery use, and different cost components. Then, fertilizer-related information is extracted and structured both at the aggregate level and broken down by type (Mineral, OrganoMineral, Other, Micro-Mineral). Each type contains specific details such as distribution area, nutrient content, and costs.
+
+Phytosanitary products are extracted by category (Herbicide, Insecticide, Fungicide) and classified by toxicity levels (0–4). These quantities are aggregated per hectare and stored in structured arrays, later converted into a unified 2D dataset.
+
+\section{Merging, Cleaning and Output Dataset}
+
+All collected data are merged by farm and year into a single DataFrame. Missing values in phytosanitary products are interpreted as non-use and replaced with zeros. Other NaNs are flagged and addressed through filtering. Outliers such as infinite values (e.g., from division by zero) are also removed to ensure numerical consistency. Basic statistics per year are printed to assess coverage and integrity.
+
+To further refine the dataset and mitigate the impact of extreme values, a robust outlier detection procedure was applied to a selected set of continuous numeric variables using an adjusted boxplot method. This approach extends the classic Tukey rule by incorporating an asymmetry correction based on the \textit{simplified medcouple}, a robust estimator of skewness. This allows for more reliable outlier identification in variables that exhibit significant skewness.
+
+The variables subjected to this cleaning step are:
+
+\begin{itemize}
+    \item \texttt{produced\_quantity}
+    \item \texttt{PLV} (saleable gross production value)
+    \item \texttt{fert\_costs}
+    \item \texttt{phyto\_costs}
+    \item \texttt{human\_costs}
+    \item \texttt{thirdy\_costs} ??
+    \item \texttt{machinery\_costs}
+    \item \texttt{Mineral\_nitrogen\_ha}
+\end{itemize}
+
+For each of these columns, extreme values are flagged as outliers based on their deviation from adjusted Turky fences, which are scaled asymmetrically depending on the estimated skewness of the distribution.
+If the data are approximately symmetric (i.e., skewness below a threshold of 0.2), the standard Tukey fences are applied. Otherwise, the method adapts the adjusted boxplot method for outliers detection throught the MedCouple skewness estimation.
+The MedCouple is a robust statistical measure used to assess the skewness, or asymmetry, of a univariate distribution. Unlike classical skewness, which is based on the third central moment and highly sensitive to outliers, the MedCouple is designed to be resistant to the influence of extreme values. It operates by analyzing the symmetry of data around the median, rather than the mean, making it particularly suitable for distributions that are not normally distributed or that contain heavy tails. The MedCouple returns a value typically between –1 and 1, where values close to zero indicate symmetry, positive values indicate right-skewed distributions (with longer tails on the right), and negative values indicate left-skewed distributions. One of its most common applications is in the adjusted boxplot method for outlier detection, where it helps to adapt the Tukey fences according to the direction and intensity of the skewness. In such cases, the MedCouple extends the upper or lower boundary of the boxplot depending on the shape of the distribution, allowing for a more accurate identification of true outliers in asymmetric data. Due to its robustness and simplicity, the MedCouple is widely used in exploratory data analysis, especially when dealing with real-world datasets that may deviate from ideal statistical assumptions.
+
+All flagged outliers are put in the dataset as Not-a-Number (NaN) to ensure statistical robustness and improve the stability of downstream modeling tasks.
+A summary about the number of detected outliers is presented in the following table.
+
+\input{tabella_output.tex}
+
+??explanation of columns headings is needed??
+
+
+The result is a flattened, cleaned panel dataset saved as \texttt{flat\_df.csv}, which serves as the input for machine learning and clustering tasks.
+
+\section*{Authors}
+Arianna Di Paola \\ Gianfranco Giulioni
+
+\end{document}
