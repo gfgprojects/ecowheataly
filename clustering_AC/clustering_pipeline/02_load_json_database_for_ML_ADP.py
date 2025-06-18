@@ -1,4 +1,4 @@
-
+#exec(open("02_load_json_database_for_ML_ADP.py").read())
 import json
 import numpy as np
 import pandas as pd
@@ -66,13 +66,15 @@ farms = np.array(farms)
 
 # -------------- PUT THE SCRIPT INTO A FUNCTION----------------------------
 def extract_data(data, anno, farms, wheat_vars, fert_vars,species='durum_wheat'):
-    columns =['year', 'farm code','farm_acreage',species] + wheat_vars + fert_vars
+    columns =['year', 'farm code','farm_acreage',species] + wheat_vars + fert_vars + ['province','altimetry']
     data_list = []
 
     for fid in farms:
         try:
             farm_acreage = data[fid]['years'][anno]['farm_acreage']
             crop = data[fid]['years'][anno][species]
+            province = data[fid]['province']
+            altimetric_zone = data[fid]['altimetry']
             row = [anno, fid,farm_acreage,species]
 
             # extract data recalled in wheat_vars
@@ -81,7 +83,7 @@ def extract_data(data, anno, farms, wheat_vars, fert_vars,species='durum_wheat')
             # extract data recalled in fert_vars
             fertilizers = crop['fertilizers']
             row.extend(fertilizers.get(key, 0) for key in fert_vars)
-
+            row.extend([province,altimetric_zone])
             data_list.append(row)
         except KeyError:
             # Handle KeyError more gracefully, e.g., log the error or return partial data
@@ -96,7 +98,7 @@ def extract_data(data, anno, farms, wheat_vars, fert_vars,species='durum_wheat')
 # Mat = extract_data(data, anno1, farms, wheat_vars, fert_vars)
 # df2 = pd.DataFrame(Mat,columns=Vars_name)
 
-Vars_name = ['year', 'farm code','farm_acreage','species'] + wheat_vars + fert_vars
+Vars_name = ['year', 'farm code','farm_acreage','species'] + wheat_vars + fert_vars + ['province','altimetry']
 years = np.arange(2008,2023)
 for year in years:
     if year == years[0]:
@@ -116,9 +118,11 @@ for i in range(len(Vars_name)):
         dtypes[i] = 'float'
 
 df1 = pd.DataFrame(Mat,columns=Vars_name)
-dtypes1 = {col: 'int' if i < 2 else 'str' if i == 3 else 'float' for i, col in enumerate(df1.columns)}
+dtypes1 = {col: 'int' if i < 2 else 'str' if i == 3 else 'str' if i == 11 else 'str' if i == 12 else 'float' for i, col in enumerate(df1.columns)}
 df1 = df1.astype(dtypes1)
 
+df3 = df1[['year','farm code','province','altimetry']]
+df1.drop(['province','altimetry'],axis='columns',inplace=True)
 
 # NOTES:
 # >> manage the "inf" in the hours_of_machines (due to 0 costs in the Azienda.scv files)
@@ -210,6 +214,7 @@ df2 = df2.astype(dtypes2)
 
 
 flat_df = pd.merge(df1, df2, on=['year', 'farm code'], how='left')
+flat_df = pd.merge(flat_df, df3, on=['year', 'farm code'], how='left')
 # where there are no data on Phytosanitary means that the farm didn't use it in that year
 # hence we insert 0 and 0 must be kept as good value!
 flat_df.fillna(0, inplace=True)

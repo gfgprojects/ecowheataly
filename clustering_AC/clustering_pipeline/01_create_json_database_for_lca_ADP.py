@@ -1,5 +1,5 @@
 #type
-#exec(open("01_create_json_database_for_lca.py").read())
+#exec(open("01_create_json_database_for_lca_ADP.py").read())
 #to run this script from the python prompt
 import os
 import pandas as pd
@@ -70,6 +70,7 @@ for code in farm_codes:
                        # "count_in_farms_file(years)": int(tmp_df.shape[0]),
                        "region":tmp_df.loc[0,"Regione"],
                        "province":tmp_df.loc[0,"Provincia"],
+                       "altimetry":tmp_df.loc[0,'Zona_Altimetrica_3'],
                        "agronomic_region":tmp_df.loc[0,"Regione_Agraria"],
                        "technical-economic_orientation":teo[0],
                        }
