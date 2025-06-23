@@ -506,5 +506,17 @@ if False:
         plt.title(TYPE)
 
 flat_df =  pd.merge(flat_df,df4,on=['year', 'farm code'], how='left')
+
+n_all_nan=0
+all_nan_idx=[]
+for idx in flat_df.index:
+    if np.isnan(list(flat_df.iloc[idx,3:8])).sum()>3:
+        n_all_nan+=1
+        all_nan_idx.append(idx)
+
+flat_df.drop(index=all_nan_idx)
+
 flat_df.to_csv("1_DB_population/flat_df.csv", index=False)
+
+
 
