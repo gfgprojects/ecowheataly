@@ -54,13 +54,14 @@ def extract_data(data, anno, farms, wheat_vars, species='durum_wheat'):
             farm_acreage = data[fid]['years'][anno]['farm_acreage']
             # crop == datasubset
             crop = data[fid]['years'][anno][species]
+            region = data[fid]['region']
             province = data[fid]['province']
             altimetric_zone = data[fid]['Zona_Altimetrica']
             row = [anno, fid,species,farm_acreage]
 
             # extract data recalled in wheat_vars
             row.extend(crop.get(key, 0) for key in wheat_vars)
-            row.extend([province,altimetric_zone])
+            row.extend([region,province,altimetric_zone])
 
             data_list.append(row)
         except KeyError:
@@ -76,7 +77,7 @@ def extract_data(data, anno, farms, wheat_vars, species='durum_wheat'):
 # Mat = extract_data(data, anno1, farms, wheat_vars, fert_vars)
 # df2 = pd.DataFrame(Mat,columns=Vars_name)
 
-Vars_name = ['year', 'farm code','species','farm_acreage'] + wheat_vars + ['province','altimetry']
+Vars_name = ['year', 'farm code','species','farm_acreage'] + wheat_vars + ['region','province','altimetry']
 years = np.arange(2008,2023)
 for year in years:
     if year == years[0]:
@@ -85,24 +86,24 @@ for year in years:
         mat = extract_data(data, str(year), farms, wheat_vars,species=species)
         Mat.extend(mat)
 
-dtypes = {}
-if False:
-    for i in range(len(Vars_name)):
-        if i <2:
-            dtypes[i] ='int'
-        elif i ==3:
-            dtypes[i] ='float'
-        elif i ==2:
-            dtypes[i] = 'str'
-        else:
-            dtypes[i] = 'float'
+#dtypes = {}
+#if False:
+#    for i in range(len(Vars_name)):
+#       if i <2:
+#            dtypes[i] ='int'
+#        elif i ==3:
+#            dtypes[i] ='float'
+#        elif i ==2:
+#            dtypes[i] = 'str'
+#        else:
+#            dtypes[i] = 'float'
 
 df1 = pd.DataFrame(Mat,columns=Vars_name)
-dtypes1 = {col: 'int' if i < 2 else 'float' if i == 3 else 'str' if i == 2 else 'str' if i == 15 else 'str' if i == 16 else 'float' for i, col in enumerate(df1.columns)}
+dtypes1 = {col: 'int' if i < 2 else 'float' if i == 3 else 'str' if i == 2 else 'str' if i >= 15 else 'float' for i, col in enumerate(df1.columns)}
 df1 = df1.astype(dtypes1)
 
-df4 = df1[['year','farm code','province','altimetry']]
-df1.drop(['province','altimetry'],axis='columns',inplace=True)
+df4 = df1[['year','farm code','region','province','altimetry']]
+df1.drop(['region','province','altimetry'],axis='columns',inplace=True)
 
 # NOTES:
 # >> manage the "inf" in the hours_of_machines (due to 0 costs in the Azienda.scv files)
@@ -505,7 +506,11 @@ if False:
         plt.legend()
         plt.title(TYPE)
 
+#add last two columns with procince and altimetry
+
 flat_df =  pd.merge(flat_df,df4,on=['year', 'farm code'], how='left')
+
+#remove rows with all nan
 
 n_all_nan=0
 all_nan_idx=[]
