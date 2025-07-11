@@ -27,6 +27,24 @@ if 'aziende_all' not in locals():
     if verbose_flag: print("Importing data from certificazioni_grano.csv")
     certificazioni_all = pd.read_csv('certificazioni_grano.csv',sep=';',decimal=',');
 
+
+#make the province names match those used in the census
+# let's create a dictionary to update some PROVINCE NAMEs:
+pr_to_update = {
+    "Aosta": "Valle d'Aosta / Vallée d'Aoste",
+    "Caltinisetta": "Caltanissetta",
+    "Carbonia Iglesias": "Sud Sardegna",
+    "Medio Campidano": "Sud Sardegna",
+    "Ogliastra": "Nuoro",
+    "Olbia-Tempio": "Sassari",
+    "Pesaro Urbino": "Pesaro e Urbino",
+    "Reggio Calabria": "Reggio di Calabria",
+    "Reggio Emilia": "Reggio nell'Emilia"
+}
+
+# Sostituisci i valori nella colonna
+aziende_all['Provincia'] = aziende_all['Provincia'].replace(pr_to_update)
+
 #farm codes
 farm_codes=aziende_all['Cod_Azienda'].drop_duplicates();
 
